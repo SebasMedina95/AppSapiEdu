@@ -5,11 +5,16 @@ import { DataSource, Repository } from 'typeorm';
 import { CreateCampusDto } from './dto/create-campus.dto';
 import { UpdateCampusDto } from './dto/update-campus.dto';
 import { Campus } from './entities/campus.entity';
-import { MySqlErrorsExceptions } from 'src/helpers/exceptions-sql';
-import { ICampus } from './interfaces/campus.interfaces';
+
 import { EResponseCodes } from 'src/constants/ResponseCodesEnum';
 import { ApiResponse } from 'src/utils/ApiResponse';
 
+import { PageOptionsDto } from 'src/helpers/paginations/dto/page-options.dto';
+import { PageDto } from 'src/helpers/paginations/dto/page.dto';
+import { MySqlErrorsExceptions } from 'src/helpers/exceptions-sql';
+import { PageMetaDto } from 'src/helpers/paginations/dto/page-meta.dto';
+
+import { ICampus } from './interfaces/campus.interfaces';
 @Injectable()
 export class CampusService {
 
@@ -53,8 +58,36 @@ export class CampusService {
     
   }
 
-  findAll() {
-    return `This action returns all campus`;
+  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ICampus>> {
+    
+    const queryBuilder = this.campusRepository.createQueryBuilder("campus");
+
+    if( pageOptionsDto.search ){
+
+      queryBuilder
+        .where("LOWER(campus.name) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .orWhere("LOWER(campus.address) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .orWhere("LOWER(campus.phone1) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .orWhere("LOWER(campus.phone2) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .orWhere("LOWER(campus.email1) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .orWhere("LOWER(campus.email2) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .orWhere("LOWER(campus.description) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .orWhere("LOWER(campus.createDocumentUserAt) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .orWhere("LOWER(campus.updateDocumentUserAt) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+
+    }
+
+    queryBuilder
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .orderBy("campus.id", pageOptionsDto.order);
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+    
   }
 
   findOne(id: number) {

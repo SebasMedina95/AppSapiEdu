@@ -5,10 +5,14 @@ import { Controller,
          Patch,
          Param,
          Delete } from '@nestjs/common';
-import { CampusService } from './campus.service';
 import { CreateCampusDto } from './dto/create-campus.dto';
 import { UpdateCampusDto } from './dto/update-campus.dto';
+         
+import { CampusService } from './campus.service';
 import { ApiResponse } from 'src/utils/ApiResponse';
+import { PageOptionsDto } from 'src/helpers/paginations/dto/page-options.dto';
+import { PageDto } from 'src/helpers/paginations/dto/page.dto';
+
 import { ICampus } from './interfaces/campus.interfaces';
 
 @Controller('campus')
@@ -20,9 +24,9 @@ export class CampusController {
     return this.campusService.create(createCampusDto);
   }
 
-  @Get()
-  findAll() {
-    return this.campusService.findAll();
+  @Get('/get-paginated')
+  async findAll(@Body() pageOptionsDto: PageOptionsDto): Promise<PageDto<ICampus>> {
+    return this.campusService.findAll(pageOptionsDto);
   }
 
   @Get(':id')
