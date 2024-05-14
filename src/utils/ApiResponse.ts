@@ -1,5 +1,5 @@
-import { IOperation } from '../common/interfaces/Operations';
-import { EResponseCodes } from '../common/constants/ResponseCodesEnum';
+import { IOperation } from '../interfaces/Operations';
+import { EResponseCodes } from '../constants/ResponseCodesEnum';
 
 interface IDataPaging {
     total: number;
