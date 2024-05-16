@@ -1,3 +1,4 @@
+import { User } from "src/modules/auth/entities/user.entity";
 import { Campus } from "src/modules/campus/entities/campus.entity";
 import { Column,
          Entity,
@@ -158,6 +159,9 @@ export class Person {
     @ManyToOne( () => Campus, (campus) => campus.persons, {eager  : true})
     @JoinColumn({ name: 'FK_SEDE' })
     campus?: Campus | number
+
+    @OneToMany( () => User, (user) => user.person)
+    public users?: User[];
 
 }
 
