@@ -14,6 +14,7 @@ import { PageOptionsDto } from 'src/helpers/paginations/dto/page-options.dto';
 import { PageDto } from 'src/helpers/paginations/dto/page.dto';
 
 import { ICampus } from './interfaces/campus.interfaces';
+import { IPerson } from '../persons/interfaces/person.interfaces';
 
 @Controller('campus')
 export class CampusController {
@@ -61,4 +62,15 @@ export class CampusController {
   remove(@Param('id') id: number): Promise<ApiResponse<ICampus | string>> {
     return this.campusService.remove(id);
   }
+
+  @Get('/get-persons-by-campus/:id')
+  findPersonsByCampus(
+    @Param('id') id: number,
+    @Body() pageOptionsDto: PageOptionsDto
+  ): Promise<PageDto<IPerson> | Object> {
+
+    return this.campusService.findPersonsByCampus(id, pageOptionsDto);
+
+  }
+
 }

@@ -4,7 +4,9 @@ import { DataSource, Repository } from 'typeorm';
 
 import { CreateCampusDto } from './dto/create-campus.dto';
 import { UpdateCampusDto } from './dto/update-campus.dto';
+
 import { Campus } from './entities/campus.entity';
+import { Person } from '../persons/entities/person.entity';
 
 import { EResponseCodes } from 'src/constants/ResponseCodesEnum';
 import { ApiResponse } from 'src/utils/ApiResponse';
@@ -15,6 +17,7 @@ import { MySqlErrorsExceptions } from 'src/helpers/exceptions-sql';
 import { PageMetaDto } from 'src/helpers/paginations/dto/page-meta.dto';
 
 import { ICampus } from './interfaces/campus.interfaces';
+import { IPerson } from '../persons/interfaces/person.interfaces';
 @Injectable()
 export class CampusService {
 
@@ -23,6 +26,7 @@ export class CampusService {
 
   constructor(
     @InjectRepository(Campus) private readonly campusRepository: Repository<Campus>,
+    @InjectRepository(Person) private readonly personRepository: Repository<Person>,
     private readonly dataSource: DataSource,
   ){}
 
@@ -239,4 +243,69 @@ export class CampusService {
     }
     
   }
+
+  async findPersonsByCampus(id:number, pageOptionsDto: PageOptionsDto): Promise<PageDto<IPerson> | Object> {
+
+    try {
+
+      const queryBuilder = this.personRepository.createQueryBuilder("person");
+
+      //* ************************* *//
+      //* Apliquemos las relaciones *//
+      //* ************************* *//
+      queryBuilder.leftJoinAndSelect("person.campus", "campus");
+
+      queryBuilder.select([
+        "person",
+        "campus"
+      ]);
+
+      if( pageOptionsDto.search ){
+
+        queryBuilder
+          //Campus/Sede
+          .where("LOWER(campus.name) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(campus.address) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(campus.phone1) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(campus.phone2) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(campus.email1) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(campus.email2) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(campus.description) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(campus.createDocumentUserAt) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(campus.updateDocumentUserAt) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          //Personas
+          .orWhere("LOWER(person.document) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(person.names) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(person.lastNames) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(person.email) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+
+      }
+
+      queryBuilder
+        .where("person.status = true")
+        .andWhere("campus.id = :paramId" , { paramId : id })
+        .skip(pageOptionsDto.skip)
+        .take(pageOptionsDto.take)
+        .orderBy("campus.id", pageOptionsDto.order);
+
+      const itemCount = await queryBuilder.getCount();
+      const { entities } = await queryBuilder.getRawAndEntities();
+      const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+      return new PageDto(entities, pageMetaDto);
+      
+    } catch (error) {
+      
+      const fail: string = await this.errorsSQL.handleDbExceptions(error);
+
+      return new ApiResponse(
+        fail,
+        EResponseCodes.FAIL,
+        "Ocurrió un error a intentar listar las sedes/campus."
+      );
+
+    }
+
+  }
+
 }
