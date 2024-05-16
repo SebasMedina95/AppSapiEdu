@@ -1,4 +1,4 @@
-import { IsDate, IsEmail,
+import { IsBoolean, IsDate, IsEmail,
          IsOptional,
          IsString,
          MaxLength,
@@ -29,8 +29,8 @@ export class CreateCampusDto {
 
     @IsString({ message: "El email 1 debe ser un String válido" })
     @MinLength(3, { message: "El email 1 debe tener al menos 3 caracteres" })
-    @MaxLength(150, { message: "El email 1 debe ser un String válido" })
-    @IsEmail({}, { message: "El email 1 no puede exceder los 150 caracteres" })
+    @MaxLength(150, { message: "El email 1 no puede exceder los 150 caracteres" })
+    @IsEmail({}, { message: "El email 1 debe ser un email válido" })
     email1: string;
 
     @IsString({ message: "El email 2 debe ser un String válido" })
@@ -43,6 +43,9 @@ export class CreateCampusDto {
     @MaxLength(500, { message: "La descripción no puede exceder los 500 caracteres" })
     @IsOptional()
     description: string;
+
+    @IsBoolean()
+    status: boolean;
 
     @IsString()
     @MinLength(1)

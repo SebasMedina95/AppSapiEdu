@@ -73,6 +73,14 @@ export class Campus {
     description: string;
 
     @Column({
+        name: "CAM_ESTADO",
+        type: 'boolean',
+        default: true,
+        comment: 'Estado lógico de eliminación de la Sede'
+    })
+    status: boolean;
+
+    @Column({
         name: "PER_USUARIO_CREACION",
         type: 'varchar',
         length: 30,

@@ -1,6 +1,8 @@
+import { ICampus } from "src/modules/campus/interfaces/campus.interfaces";
 
 export interface IPerson {
     id?: number;
+    campus?: ICampus | number;
     documentType: string;
     document: string;
     names: string;
@@ -11,7 +13,8 @@ export interface IPerson {
     email: string;
     birthDate: Date;
     bloodType: string;
-    status: string;
+    type: string;
+    status: boolean;
     createUserAt?: string;
     createDateAt?: Date;
     updateUserAt?: string;

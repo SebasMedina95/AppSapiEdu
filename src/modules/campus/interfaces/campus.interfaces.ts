@@ -8,6 +8,7 @@ export interface ICampus {
     email1: string;
     email2?: string;
     description?: string;
+    status: boolean;
     createDocumentUserAt?: string;
     createDateAt?: Date;
     updateDocumentUserAt?: string;

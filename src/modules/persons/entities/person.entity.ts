@@ -102,13 +102,20 @@ export class Person {
     bloodType: string;
 
     @Column({
-        name: "PER_ESTADO",
+        name: "PER_TIPO",
         type: 'varchar',
-        length: 1,
-        comment: 'Estado Lógico de la Persona',
-        default: 'S'
+        length: 2,
+        comment: 'Tipo de persona'
     })
-    status: string;
+    type: string;
+
+    @Column({
+        name: "PER_ESTADO",
+        type: 'boolean',
+        comment: 'Estado Lógico de la Persona',
+        default: true
+    })
+    status: boolean;
 
     @Column({
         name: "PER_USUARIO_CREACION",

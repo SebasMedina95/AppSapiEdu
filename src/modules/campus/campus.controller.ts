@@ -17,30 +17,48 @@ import { ICampus } from './interfaces/campus.interfaces';
 
 @Controller('campus')
 export class CampusController {
+
   constructor(private readonly campusService: CampusService) {}
 
   @Post('/create')
-  async create(@Body() createCampusDto: CreateCampusDto): Promise<ApiResponse<ICampus | string>> {
+  async create(
+    @Body() createCampusDto: CreateCampusDto
+  ): Promise<ApiResponse<ICampus | string>> {
+
     return this.campusService.create(createCampusDto);
+
   }
 
   @Get('/get-paginated')
-  async findAll(@Body() pageOptionsDto: PageOptionsDto): Promise<PageDto<ICampus>> {
+  async findAll(
+    @Body() pageOptionsDto: PageOptionsDto
+  ): Promise<PageDto<ICampus> | Object> {
+
     return this.campusService.findAll(pageOptionsDto);
+
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.campusService.findOne(+id);
+  @Get('/get-by-id/:id')
+  findOne(
+    @Param('id') id: number
+  ): Promise<ApiResponse<ICampus | string>> {
+
+    return this.campusService.findOne(id);
+
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCampusDto: UpdateCampusDto) {
-    return this.campusService.update(+id, updateCampusDto);
+  @Patch('/update/:id')
+  update(
+    @Param('id') id: number, 
+    @Body() updateCampusDto: UpdateCampusDto
+  ): Promise<ApiResponse<ICampus | string>> {
+
+    return this.campusService.update(id, updateCampusDto);
+
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.campusService.remove(+id);
+  @Delete('/remove-logic/:id')
+  remove(@Param('id') id: number): Promise<ApiResponse<ICampus | string>> {
+    return this.campusService.remove(id);
   }
 }
