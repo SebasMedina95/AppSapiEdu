@@ -14,6 +14,7 @@ import { ApiResponse } from 'src/utils/ApiResponse';
 
 @Controller('user')
 export class UserController {
+  
   constructor(private readonly userService: UserService) {}
 
   @Post('/create')

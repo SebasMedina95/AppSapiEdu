@@ -14,6 +14,7 @@ import { IResponseTransactionBasic, IUser, IUserWithPermitions } from '../interf
 import { MySqlErrorsExceptions } from 'src/helpers/exceptions-sql';
 import { ApiResponse } from 'src/utils/ApiResponse';
 import { EResponseCodes } from 'src/constants/ResponseCodesEnum';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,7 @@ export class UserService {
 
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(PermitAssignment) private readonly permitAssignmentRepository: Repository<PermitAssignment>,
+    private readonly emailService: EmailService,
     private readonly dataSource: DataSource,
 
   ){}
@@ -38,14 +40,20 @@ export class UserService {
     try {
 
       //Validamos primero porque un usuario solo pertenece a una persona y una persona solo puede tener un usuario
-      const getPerson = await this.userRepository.find({
-        where: { person: createUserDto.person }
-      });
+      const queryBuilderForGetPerson = this.userRepository.createQueryBuilder("user");
+      queryBuilderForGetPerson.leftJoinAndSelect("user.person", "person");
+      queryBuilderForGetPerson.select([ "user", "person" ]);
+      queryBuilderForGetPerson.where("user.person = :paramId" , { paramId : createUserDto.person });
+      queryBuilderForGetPerson.getOne();
+      const { entities } = await queryBuilderForGetPerson.getRawAndEntities();
+      const entitiesUnk = entities as unknown;
+      const entitiesForGetPerson = entitiesUnk as IUser[];
 
-      if( getPerson || getPerson.length != 0 ) 
-        return new ApiResponse(null, EResponseCodes.FAIL, `La persona determinada ya tiene un usuario creado (${getPerson[0].user}).`);
-
+      if( entitiesForGetPerson && entitiesForGetPerson.length != 0 )
+        return new ApiResponse(null, EResponseCodes.FAIL, `La persona determinada ya tiene un usuario creado (${entitiesForGetPerson[0].user}).`);
+     
       //Construcción de objeto usuario para insersión
+      //Realizamos la primera parte que es insertar al usuario
       const resUser = this.userRepository.create({ 
         user: createUserDto.user,
         password: bcrypt.hashSync( createUserDto.password, 10 ),
@@ -92,7 +100,7 @@ export class UserService {
       }
 
       //Enviar email:
-      //TODO:
+      await this.emailService.sendEmailValidationUser(factoryResult.userResponse.id);
 
       return new ApiResponse(factoryResult, EResponseCodes.OK, "Usuario creado correctamente.");
       
@@ -100,6 +108,14 @@ export class UserService {
 
       this.logger.error(`${error}, realizando Rollback`);
       await queryRunner.rollbackTransaction();
+
+      const fail: string = await this.errorsSQL.handleDbExceptions(error);
+
+      return new ApiResponse(
+        fail,
+        EResponseCodes.FAIL,
+        "No se pudo crear el usuario."
+      );
 
     } finally {
 

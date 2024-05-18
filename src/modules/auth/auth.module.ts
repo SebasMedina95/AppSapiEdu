@@ -7,6 +7,7 @@ import { AuthController } from './controllers/auth.controller';
 
 import { UserService } from './services/user.service';
 import { AuthService } from './services/auth.service';
+import { EmailService } from './services/email.service';
 
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
@@ -20,6 +21,7 @@ import { Person } from '../persons/entities/person.entity';
   ],
   providers: [
     UserService,
+    EmailService,
     AuthService
   ],
   imports: [
