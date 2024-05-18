@@ -37,9 +37,15 @@ export class UserService {
 
     try {
 
-      //TODO: Validar que la persona ya no hubiera estado asignada
-      
+      //Validamos primero porque un usuario solo pertenece a una persona y una persona solo puede tener un usuario
+      const getPerson = await this.userRepository.find({
+        where: { person: createUserDto.person }
+      });
 
+      if( getPerson || getPerson.length != 0 ) 
+        return new ApiResponse(null, EResponseCodes.FAIL, `La persona determinada ya tiene un usuario creado (${getPerson[0].user}).`);
+
+      //Construcción de objeto usuario para insersión
       const resUser = this.userRepository.create({ 
         user: createUserDto.user,
         password: bcrypt.hashSync( createUserDto.password, 10 ),
@@ -53,8 +59,13 @@ export class UserService {
       await this.userRepository.save(resUser);
       delete resUser.password;
 
-      if( !resUser ) return new ApiResponse(null, EResponseCodes.FAIL, "Fallo la transacción de creación.");
+      //Si hay error cancelo la operación
+      if( !resUser ) {
+        await queryRunner.rollbackTransaction();
+        return new ApiResponse(null, EResponseCodes.FAIL, "Fallo la transacción de creación.");
+      }
 
+      //Si pasa el proceso anterior, ahora registramos los roles del usuario
       const transactionsForPermitions: IUserWithPermitions[] = [];
 
       for (const rolesTrx of createUserDto.permit) {
@@ -72,12 +83,16 @@ export class UserService {
 
       }
 
+      //Genero la transacción completa
       await queryRunner.commitTransaction();
 
       const factoryResult: IResponseTransactionBasic = {
         userResponse: resUser,
         permitionsResponse: transactionsForPermitions as IUserWithPermitions[]
       }
+
+      //Enviar email:
+      //TODO:
 
       return new ApiResponse(factoryResult, EResponseCodes.OK, "Usuario creado correctamente.");
       
