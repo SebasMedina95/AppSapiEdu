@@ -52,6 +52,15 @@ password: string;
 isValid: boolean;
 
 @Column({
+   name: "USU_AVATAR",
+   type: 'varchar',
+   default: "default.png",
+   nullable: true,
+   comment: 'Imagen del usuario'
+})
+avatar: string;
+
+@Column({
    name: "USU_USUARIO_CREO",
    type: 'varchar',
    length: 30,

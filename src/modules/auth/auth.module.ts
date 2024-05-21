@@ -13,6 +13,7 @@ import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
 import { PermitAssignment } from './entities/permit-assignment.entity';
 import { Person } from '../persons/entities/person.entity';
+import { PersonsService } from '../persons/persons.service';
 
 @Module({
   controllers: [
@@ -22,7 +23,8 @@ import { Person } from '../persons/entities/person.entity';
   providers: [
     UserService,
     EmailService,
-    AuthService
+    AuthService,
+    PersonsService
   ],
   imports: [
 

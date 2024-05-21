@@ -1,7 +1,7 @@
-import { IPerson } from "src/modules/persons/interfaces/person.interfaces";
-import { IPermit } from "./permit-assignment.interface";
 import { Role } from "../entities/role.entity";
 import { User } from "../entities/user.entity";
+import { Person } from "src/modules/persons/entities/person.entity";
+import { PermitAssignment } from "../entities/permit-assignment.entity";
 
 export interface IUser {
     id?: number;
@@ -9,12 +9,13 @@ export interface IUser {
     password: string;
     status?: boolean;
     isValid?: boolean;
+    avatar?: string;
     createDocumentUserAt?: string;
     createDateAt?: Date;
     updateDocumentUserAt?: string;
     updateDateAt?: Date;
-    person?: IPerson | number;
-    permit?: IPermit[]
+    person?: Person | number;
+    permit?: PermitAssignment[]
 }
 
 export interface IUserWithPermitions {

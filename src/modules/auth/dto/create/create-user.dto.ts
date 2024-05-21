@@ -34,6 +34,10 @@ export class CreateUserDto {
     isValid: boolean;
 
     @IsString()
+    @IsOptional()
+    avatar: string;
+
+    @IsString()
     @MinLength(1)
     @IsOptional()
     createDocumentUserAt: string;

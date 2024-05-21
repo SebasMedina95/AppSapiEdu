@@ -1,10 +1,10 @@
-import { IRole } from "./role.interface";
-import { IUser } from "./user.interface";
+import { Role } from "../entities/role.entity";
+import { User } from "../entities/user.entity";
 
 export interface IPermit {
     id: number;
     createDocumentUserAt?: string;
     createDateAt?: Date;
-    role?: IRole[];
-    user?: IUser
+    role?: Role[];
+    user?: User
 }
