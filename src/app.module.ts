@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { dataSourceOptions } from './config/database/data-source';
 
+import { FilesModule } from './helpers/files/files.module';
+
 import { AuthModule } from './modules/auth/auth.module';
 import { BudgetsRoutesModule } from './modules/budgets-routes/budgets-routes.module';
 import { CampusModule } from './modules/campus/campus.module';
@@ -31,6 +33,7 @@ import { ProjectsModule } from './modules/projects/projects.module';
     BudgetsRoutesModule,
     CampusModule,
     ControlEntitiesModule,
+    FilesModule,
     FunctionalAreasModule,
     FundsModule,
     ManagementCentersModule,

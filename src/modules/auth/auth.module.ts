@@ -8,12 +8,13 @@ import { AuthController } from './controllers/auth.controller';
 import { UserService } from './services/user.service';
 import { AuthService } from './services/auth.service';
 import { EmailService } from './services/email.service';
+import { PersonsService } from '../persons/persons.service';
+import { FilesService } from 'src/helpers/files/files.service';
 
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
 import { PermitAssignment } from './entities/permit-assignment.entity';
 import { Person } from '../persons/entities/person.entity';
-import { PersonsService } from '../persons/persons.service';
 
 @Module({
   controllers: [
@@ -24,7 +25,8 @@ import { PersonsService } from '../persons/persons.service';
     UserService,
     EmailService,
     AuthService,
-    PersonsService
+    PersonsService,
+    FilesService
   ],
   imports: [
 

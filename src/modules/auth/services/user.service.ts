@@ -15,7 +15,7 @@ import { User } from '../entities/user.entity';
 import { Person } from 'src/modules/persons/entities/person.entity';
 import { EmailService } from './email.service';
 
-import { IResponseTransactionBasic, IUser, IUserWithPermitions } from '../interfaces/user.interface';
+import { IEditUserWithUploadAvatarFile, IResponseTransactionBasic, IUser, IUserWithPermitions } from '../interfaces/user.interface';
 import { IPerson } from 'src/modules/persons/interfaces/person.interfaces';
 
 import { MySqlErrorsExceptions } from 'src/helpers/exceptions-sql';
@@ -258,23 +258,21 @@ export class UserService {
 
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResponse<IUser | string>> {
+  async update(data: IEditUserWithUploadAvatarFile): Promise<ApiResponse<IUser | string>> {
 
     try {
 
       //Encontremos primero el usuario por el ID
-      const getUser: ApiResponse<string | IUser> = await this.findOne(id);
+      const getUser: ApiResponse<string | IUser> = await this.findOne(Number(data.id));
 
       if( getUser.data == null )
         return new ApiResponse(null, EResponseCodes.FAIL, "El usuario no pudo ser encontrado.");
 
-      //TODO: Ajustar el tema de Cloudinary para adjuntar la imagen de perfil
-
       const updateUser = await this.userRepository.preload({
-        id,
-        user: updateUserDto.user,
-        password: bcrypt.hashSync( updateUserDto.password, 10 ),
-        avatar: updateUserDto.avatar,
+        id: Number(data.id),
+        user: data.user,
+        password: bcrypt.hashSync( data.password, 10 ),
+        avatar: data.avatar,
         updateDocumentUserAt: "123456789",
         updateDateAt: new Date(),
       })

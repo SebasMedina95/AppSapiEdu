@@ -24,4 +24,9 @@ export const envs = {
     MAILER_SECRET_KEY: get('MAILER_SECRET_KEY').required().asString(),
     SEND_EMAIL: get('SEND_EMAIL').required().asBool(),
 
+    //*** IMAGENES CLOUDINARY ****/
+    CLOUDINARY_NAME: get('CLOUDINARY_NAME').required().asString(),
+    CLOUDINARY_API_KEY: get('CLOUDINARY_API_KEY').required().asString(),
+    CLOUDINARY_API_SECRET: get('CLOUDINARY_API_SECRET').required().asString(),
+
 }

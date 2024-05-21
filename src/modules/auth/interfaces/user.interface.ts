@@ -32,3 +32,11 @@ export interface IResponseTransactionBasic {
     userResponse: IUser | User;
     permitionsResponse: IUserWithPermitions[];
 }
+
+export interface IEditUserWithUploadAvatarFile {
+    id: number;
+    user: string;
+    password: string;
+    avatar?: string;
+    changeImageUser?: string;
+}

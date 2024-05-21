@@ -4,21 +4,32 @@ import { Controller,
          Body,
          Patch,
          Param,
-         Delete } from '@nestjs/common';
+         Delete, 
+         UseInterceptors,
+         UploadedFile,
+         ParseFilePipe,
+         MaxFileSizeValidator,
+         FileTypeValidator} from '@nestjs/common';
 import { UserService } from '../services/user.service';
 
 import { CreateUserDto } from '../dto/create/create-user.dto';
 import { UpdateUserDto } from '../dto/update/update-user.dto';
 import { PageOptionsDto } from 'src/helpers/paginations/dto/page-options.dto';
 
-import { IResponseTransactionBasic, IUser } from '../interfaces/user.interface';
+import { IEditUserWithUploadAvatarFile, IResponseTransactionBasic, IUser } from '../interfaces/user.interface';
 import { ApiResponse } from 'src/utils/ApiResponse';
 import { PageDto } from 'src/helpers/paginations/dto/page.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesService } from 'src/helpers/files/files.service';
+import { CloudinaryResponse } from 'src/helpers/files/files-response';
 
 @Controller('user')
 export class UserController {
   
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly cloudinaryService: FilesService
+  ) {}
 
   @Post('/create')
   async create(
@@ -47,13 +58,78 @@ export class UserController {
 
   }
 
-  @Patch('/update/:id')
+  @Post('/update/:id')
+  @UseInterceptors( FileInterceptor('avatar') )
   async update(
-    @Param('id') id: string, 
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), //4 MB
+          new FileTypeValidator({ fileType: '.(png|jpg|jpeg)' }),
+        ]
+      }),
+    )
+    file: Express.Multer.File,
+    @Param('id') id: number, 
     @Body() updateUserDto: UpdateUserDto
-  ): Promise<ApiResponse<IUser | string>> {
+  ) {
 
-    return this.userService.update(+id, updateUserDto);
+    let url_cloudinary: string = "";
+
+    //Obtengamos el usuario:
+    const getUser: ApiResponse<IUser | string> = await this.userService.findOne(id);
+    const user = getUser.data as IUser;
+    let objReg: IEditUserWithUploadAvatarFile;
+
+    if( updateUserDto.changeImageUser == "S" ){
+
+      //Debemos eliminar la imagen que había para no dejar residuos en cloudinary
+      if( getUser.data ){
+        
+        if( user.avatar != null || user.avatar != "default.png" ){
+          const arrayName = user.avatar.split('/'); //La url completa separa por /
+          const getName = arrayName[arrayName.length - 1]; //Al final tenemos la imagen con su extension
+          const [ name , ext ] = getName.split('.'); //Separo la extensión de la imagen y lo que me queda es el nombre de la 
+                                                    //imagen, el cual, viene siendo en últimas el mismo id que asigna cloudinary
+
+          //Borramos con una función propia de cloudinary
+          await this.cloudinaryService.deleteFile(name);
+
+        }
+      }
+
+      let executeFile = this.cloudinaryService.uploadFile(file);
+
+      executeFile.then( p  => {
+
+        url_cloudinary = p.url;
+
+        const objReg: IEditUserWithUploadAvatarFile = {
+          id,
+          user: updateUserDto.user,
+          password: updateUserDto.password,
+          avatar: url_cloudinary
+        }
+
+        this.userService.update(objReg);
+
+      })
+
+      return executeFile;
+
+    }else{
+
+      const objReg: IEditUserWithUploadAvatarFile = {
+        id,
+        user: updateUserDto.user,
+        password: updateUserDto.password,
+        avatar: user.avatar
+      }
+
+      const updateUser = await this.userService.update(objReg);
+      return updateUser;
+
+    }
 
   }
 
