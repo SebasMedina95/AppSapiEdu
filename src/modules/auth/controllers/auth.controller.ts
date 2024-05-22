@@ -1,40 +1,43 @@
 import { Controller,
-         Get,
          Post,
-         Body,
-         Patch,
-         Param,
-         Delete } from '@nestjs/common';
+         Body, 
+         Get,
+         UseGuards} from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { CreateAuthDto } from '../dto/create/create-auth.dto';
-import { UpdateAuthDto } from '../dto/update/update-auth.dto';
+import { RecoveryUserDto } from '../dto/recovery/recovery-user.dto';
+import { ApiResponse } from 'src/utils/ApiResponse';
+import { IUser, IUserAuthenticated } from '../interfaces/user.interface';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('/login')
+  async login(
+    @Body() createAuthDto: CreateAuthDto
+  ): Promise<ApiResponse<IUserAuthenticated | null>> {
+
+    return this.authService.login(createAuthDto);
+
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @Post('/recovery')
+  async recovery(
+    @Body() recoveryUserDto: RecoveryUserDto
+  ): Promise<ApiResponse<IUser | null>> {
+
+    return this.authService.recovery(recoveryUserDto);
+
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  @Get('/test-private-route')
+  @UseGuards( AuthGuard() )
+  testingPrivateRoute(): Promise<ApiResponse<string | null>> {
+
+    return this.authService.testingPrivateRoute();
+
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
-  }
 }

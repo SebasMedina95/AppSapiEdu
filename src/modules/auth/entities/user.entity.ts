@@ -1,4 +1,4 @@
-import { Column,
+import { BeforeInsert, BeforeUpdate, Column,
     Entity,
     JoinColumn,
     ManyToOne,
@@ -104,5 +104,19 @@ person?: Person | number
 
 @OneToMany( () => PermitAssignment, (permit) => permit.user, {eager  : true})
 permit?: PermitAssignment[];
+
+//* ********************************************** *//
+//* ***** ANTES DE IMPACTAR LA BASE DE DATOS ***** *//
+//* ********************************************** *//
+@BeforeInsert()
+checkFildsBeforeInsert(){
+   this.user = this.user.trim();
+   this.password = this.password.trim();
+}
+
+@BeforeUpdate()
+checkFildsBeforeUpdate(){
+   this.checkFildsBeforeInsert();
+}
 
 }

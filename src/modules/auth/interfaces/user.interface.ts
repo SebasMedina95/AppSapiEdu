@@ -40,3 +40,8 @@ export interface IEditUserWithUploadAvatarFile {
     avatar?: string;
     changeImageUser?: string;
 }
+
+export interface IUserAuthenticated {
+    user: IUser;
+    token: string;
+}

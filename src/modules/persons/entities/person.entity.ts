@@ -1,6 +1,6 @@
 import { User } from "src/modules/auth/entities/user.entity";
 import { Campus } from "src/modules/campus/entities/campus.entity";
-import { Column,
+import { BeforeInsert, BeforeUpdate, Column,
          Entity,
          JoinColumn,
          ManyToOne,
@@ -162,6 +162,25 @@ export class Person {
 
     @OneToMany( () => User, (user) => user.person)
     public users?: User[];
+
+    //* ****************************************** *//
+    //* ***** AJUSTE DATA ANTES DE ORGANIZAR ***** *//
+    //* ****************************************** *//
+    @BeforeInsert()
+    checkFildsBeforeInsert(){
+        this.email = this.email.toLowerCase().trim();
+        this.document = this.document.trim();
+        this.email = this.email.trim();
+        this.address = this.address.trim();
+        this.phone = this.phone.trim();
+        this.names = this.names.trim();
+        this.lastNames = this.lastNames.trim();
+    }
+
+    @BeforeUpdate()
+    checkFildsBeforeUpdate(){
+        this.checkFildsBeforeInsert();
+    }
 
 }
 

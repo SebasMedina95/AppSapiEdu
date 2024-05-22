@@ -104,7 +104,7 @@ export class UserController {
 
         url_cloudinary = p.url;
 
-        const objReg: IEditUserWithUploadAvatarFile = {
+        objReg = {
           id,
           user: updateUserDto.user,
           password: updateUserDto.password,
@@ -119,7 +119,7 @@ export class UserController {
 
     }else{
 
-      const objReg: IEditUserWithUploadAvatarFile = {
+      objReg = {
         id,
         user: updateUserDto.user,
         password: updateUserDto.password,
