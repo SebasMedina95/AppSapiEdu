@@ -17,6 +17,7 @@ import { PersonsModule } from './modules/persons/persons.module';
 import { PosPreOriginModule } from './modules/pos-pre-origin/pos-pre-origin.module';
 import { PosPreSapiModule } from './modules/pos-pre-sapi/pos-pre-sapi.module';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { RoleModule } from './helpers/roles/valid-roles.module';
 
 
 @Module({
@@ -33,7 +34,6 @@ import { ProjectsModule } from './modules/projects/projects.module';
     BudgetsRoutesModule,
     CampusModule,
     ControlEntitiesModule,
-    FilesModule,
     FunctionalAreasModule,
     FundsModule,
     ManagementCentersModule,
@@ -41,6 +41,10 @@ import { ProjectsModule } from './modules/projects/projects.module';
     PosPreOriginModule,
     PosPreSapiModule,
     ProjectsModule,
+
+    //? Módulos tipo Helper
+    FilesModule,
+    RoleModule,
 
   ],
   controllers: [],

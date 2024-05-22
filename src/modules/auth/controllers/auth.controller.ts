@@ -2,13 +2,17 @@ import { Controller,
          Post,
          Body, 
          Get,
-         UseGuards} from '@nestjs/common';
+         UseGuards,
+         SetMetadata} from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { CreateAuthDto } from '../dto/create/create-auth.dto';
 import { RecoveryUserDto } from '../dto/recovery/recovery-user.dto';
 import { ApiResponse } from 'src/utils/ApiResponse';
 import { IUser, IUserAuthenticated } from '../interfaces/user.interface';
 import { AuthGuard } from '@nestjs/passport';
+import { MyGetUserDecorator } from '../decorators/get-user.decorator';
+import { UserRoleGuard } from '../guards/user-role.guard';
+import { Auth } from '../decorators/auth-protected.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -33,9 +37,12 @@ export class AuthController {
   }
 
   @Get('/test-private-route')
-  @UseGuards( AuthGuard() )
-  testingPrivateRoute(): Promise<ApiResponse<string | null>> {
+  @Auth('EMPANADA','PASTEL DE POLLO')
+  testingPrivateRoute(
+    @MyGetUserDecorator() user: IUser
+  ): Promise<ApiResponse<string | null>> {
 
+    // console.log({ user });
     return this.authService.testingPrivateRoute();
 
   }
