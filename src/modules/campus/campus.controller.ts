@@ -15,6 +15,9 @@ import { PageDto } from 'src/helpers/paginations/dto/page.dto';
 
 import { ICampus } from './interfaces/campus.interfaces';
 import { IPerson } from '../persons/interfaces/person.interfaces';
+import { Auth } from '../auth/decorators/auth-protected.decorator';
+import { MyGetUserDecorator } from '../auth/decorators/get-user.decorator';
+import { IUser } from '../auth/interfaces/user.interface';
 
 @Controller('campus')
 export class CampusController {
@@ -22,15 +25,18 @@ export class CampusController {
   constructor(private readonly campusService: CampusService) {}
 
   @Post('/create')
+  @Auth('CAMPUS')
   async create(
-    @Body() createCampusDto: CreateCampusDto
+    @Body() createCampusDto: CreateCampusDto,
+    @MyGetUserDecorator() user: IUser
   ): Promise<ApiResponse<ICampus | string>> {
 
-    return this.campusService.create(createCampusDto);
+    return this.campusService.create(createCampusDto, user);
 
   }
 
   @Get('/get-paginated')
+  @Auth('CAMPUS')
   async findAll(
     @Body() pageOptionsDto: PageOptionsDto
   ): Promise<PageDto<ICampus> | Object> {
@@ -40,6 +46,7 @@ export class CampusController {
   }
 
   @Get('/get-by-id/:id')
+  @Auth('CAMPUS')
   findOne(
     @Param('id') id: number
   ): Promise<ApiResponse<ICampus | string>> {
@@ -49,21 +56,25 @@ export class CampusController {
   }
 
   @Patch('/update/:id')
+  @Auth('CAMPUS')
   update(
     @Param('id') id: number, 
-    @Body() updateCampusDto: UpdateCampusDto
+    @Body() updateCampusDto: UpdateCampusDto,
+    @MyGetUserDecorator() user: IUser
   ): Promise<ApiResponse<ICampus | string>> {
 
-    return this.campusService.update(id, updateCampusDto);
+    return this.campusService.update(id, updateCampusDto, user);
 
   }
 
   @Delete('/remove-logic/:id')
+  @Auth('CAMPUS')
   remove(@Param('id') id: number): Promise<ApiResponse<ICampus | string>> {
     return this.campusService.remove(id);
   }
 
   @Get('/get-persons-by-campus/:id')
+  @Auth('CAMPUS')
   findPersonsByCampus(
     @Param('id') id: number,
     @Body() pageOptionsDto: PageOptionsDto

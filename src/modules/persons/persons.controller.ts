@@ -15,6 +15,9 @@ import { PageDto } from 'src/helpers/paginations/dto/page.dto';
 import { ApiResponse } from 'src/utils/ApiResponse';
 
 import { IPerson } from './interfaces/person.interfaces';
+import { IUser } from '../auth/interfaces/user.interface';
+import { Auth } from '../auth/decorators/auth-protected.decorator';
+import { MyGetUserDecorator } from '../auth/decorators/get-user.decorator';
 
 @Controller('persons')
 export class PersonsController {
@@ -22,15 +25,18 @@ export class PersonsController {
   constructor(private readonly personsService: PersonsService) {}
 
   @Post('/create')
+  @Auth('PERSONS')
   create(
-    @Body() createPersonDto: CreatePersonDto
+    @Body() createPersonDto: CreatePersonDto,
+    @MyGetUserDecorator() user: IUser
   ): Promise<ApiResponse<IPerson | string>> {
 
-    return this.personsService.create(createPersonDto);
+    return this.personsService.create(createPersonDto, user);
 
   }
 
   @Get('/get-paginated')
+  @Auth('PERSONS')
   async findAll(
     @Body() pageOptionsDto: PageOptionsDto
   ): Promise<PageDto<IPerson>> {
@@ -40,6 +46,7 @@ export class PersonsController {
   }
 
   @Get('/get-by-id/:id')
+  @Auth('PERSONS')
   async findOne(
     @Param('id') id: number
   ): Promise<ApiResponse<IPerson | string>> {
@@ -49,16 +56,19 @@ export class PersonsController {
   }
 
   @Patch('/update/:id')
+  @Auth('PERSONS')
   update(
     @Param('id') id: number, 
-    @Body() updatePersonDto: UpdatePersonDto
+    @Body() updatePersonDto: UpdatePersonDto,
+    @MyGetUserDecorator() user: IUser
   ): Promise<ApiResponse<IPerson | string>> {
 
-    return this.personsService.update(id, updatePersonDto);
+    return this.personsService.update(id, updatePersonDto, user);
 
   }
 
   @Delete('/remove-logic/:id')
+  @Auth('PERSONS')
   remove(
     @Param('id') id: number
   ): Promise<ApiResponse<IPerson | string>> {

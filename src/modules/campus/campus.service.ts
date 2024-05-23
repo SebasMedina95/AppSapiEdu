@@ -18,6 +18,7 @@ import { PageMetaDto } from 'src/helpers/paginations/dto/page-meta.dto';
 
 import { ICampus } from './interfaces/campus.interfaces';
 import { IPerson } from '../persons/interfaces/person.interfaces';
+import { IUser } from '../auth/interfaces/user.interface';
 @Injectable()
 export class CampusService {
 
@@ -30,14 +31,15 @@ export class CampusService {
     private readonly dataSource: DataSource,
   ){}
 
-  async create(createCampusDto: CreateCampusDto): Promise<ApiResponse<ICampus | string>> {
+  async create(createCampusDto: CreateCampusDto, user: IUser): Promise<ApiResponse<ICampus | string>> {
     
     try {
 
+      const personUser: IPerson = user.person as IPerson;
       const registerCampus = this.campusRepository.create({
-        createDocumentUserAt: "123456789",
+        createDocumentUserAt: personUser.document,
         createDateAt: new Date(),
-        updateDocumentUserAt: "123456789",
+        updateDocumentUserAt: personUser.document,
         updateDateAt: new Date(),
         ...createCampusDto
       });
@@ -154,10 +156,11 @@ export class CampusService {
     
   }
 
-  async update(id: number, updateCampusDto: UpdateCampusDto): Promise<ApiResponse<ICampus | string>> {
+  async update(id: number, updateCampusDto: UpdateCampusDto, user: IUser): Promise<ApiResponse<ICampus | string>> {
     
     try {
 
+      const personUser: IPerson = user.person as IPerson;
       const getCampus = await this.findOne(id);
       
       if( getCampus.data == null || !getCampus.data ){
@@ -172,7 +175,7 @@ export class CampusService {
 
       const updateCampus = await this.campusRepository.preload({
         id,
-        updateDocumentUserAt: "123456789",
+        updateDocumentUserAt: personUser.document,
         updateDateAt: new Date(),
         ...updateCampusDto
       });

@@ -37,7 +37,7 @@ export class AuthController {
   }
 
   @Get('/test-private-route')
-  @Auth('EMPANADA','PASTEL DE POLLO')
+  @Auth('AUTH')
   testingPrivateRoute(
     @MyGetUserDecorator() user: IUser
   ): Promise<ApiResponse<string | null>> {

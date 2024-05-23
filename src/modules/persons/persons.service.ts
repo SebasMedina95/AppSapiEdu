@@ -14,6 +14,7 @@ import { ApiResponse } from 'src/utils/ApiResponse';
 import { Person } from './entities/person.entity';
 
 import { IPerson } from './interfaces/person.interfaces';
+import { IUser } from '../auth/interfaces/user.interface';
 import { EResponseCodes } from 'src/constants/ResponseCodesEnum';
 
 @Injectable()
@@ -29,14 +30,15 @@ export class PersonsService {
 
   ){}
 
-  async create(createPersonDto: CreatePersonDto): Promise<ApiResponse<IPerson | string>> {
+  async create(createPersonDto: CreatePersonDto, user: IUser): Promise<ApiResponse<IPerson | string>> {
     
     try {
 
+      const personUser: IPerson = user.person as IPerson;
       const createPerson = this.personRepository.create({ 
-        createDocumentUserAt: "123456789",
+        createDocumentUserAt: personUser.document,
         createDateAt: new Date(),
-        updateDocumentUserAt: "123456789",
+        updateDocumentUserAt: personUser.document,
         updateDateAt: new Date(),
         ...createPersonDto
       });
@@ -159,10 +161,11 @@ export class PersonsService {
     
   }
 
-  async update(id: number, updatePersonDto: UpdatePersonDto): Promise<ApiResponse<IPerson | string>> {
+  async update(id: number, updatePersonDto: UpdatePersonDto, user: IUser): Promise<ApiResponse<IPerson | string>> {
     
     try {
       
+      const personUser: IPerson = user.person as IPerson;
       const getPerson = await this.findOne(id);
       
       if( getPerson.data == null ){
@@ -177,7 +180,7 @@ export class PersonsService {
 
       const updatePerson = await this.personRepository.preload({
         id,
-        updateDocumentUserAt: "123456789",
+        updateDocumentUserAt: personUser.document,
         updateDateAt: new Date(),
         ...updatePersonDto
       })
