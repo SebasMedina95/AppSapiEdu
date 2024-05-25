@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,
+         Get,
+         Post,
+         Body,
+         Patch,
+         Param,
+         Delete } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { PosPreOriginService } from './pos-pre-origin.service';
+
 import { CreatePosPreOriginDto } from './dto/create-pos-pre-origin.dto';
 import { UpdatePosPreOriginDto } from './dto/update-pos-pre-origin.dto';
 
+@ApiTags("Módulo de Posiciones Presupuestales de Origen")
 @Controller('pos-pre-origin')
 export class PosPreOriginController {
   constructor(private readonly posPreOriginService: PosPreOriginService) {}

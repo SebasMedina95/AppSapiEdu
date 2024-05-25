@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,
+         Get,
+         Post,
+         Body,
+         Patch,
+         Param,
+         Delete } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { ManagementCentersService } from './management-centers.service';
+
 import { CreateManagementCenterDto } from './dto/create-management-center.dto';
 import { UpdateManagementCenterDto } from './dto/update-management-center.dto';
 
+@ApiTags("Módulo de Centros Gestores")
 @Controller('management-centers')
 export class ManagementCentersController {
   constructor(private readonly managementCentersService: ManagementCentersService) {}

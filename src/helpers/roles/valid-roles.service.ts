@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { Role } from "src/modules/auth/entities/role.entity";
-import { ApiResponse } from "src/utils/ApiResponse";
+import { ApiTransactionResponse } from "src/utils/ApiResponse";
 import { IRole } from "src/modules/auth/interfaces/role.interface";
 import { EResponseCodes } from "src/constants/ResponseCodesEnum";
 
@@ -19,16 +19,16 @@ export class RolesService {
         @InjectRepository(Role) private readonly roleRepository: Repository<Role>
     ){}
 
-    async getRoles(): Promise<ApiResponse<IRole[] | null>> {
+    async getRoles(): Promise<ApiTransactionResponse<IRole[] | null>> {
 
         const queryBuilder = this.roleRepository.createQueryBuilder("role");
         const { entities } = await queryBuilder.getRawAndEntities();
         const getRoles: IRole[] = entities as IRole[];
 
         if( !getRoles || getRoles.length == 0 )
-            return new ApiResponse(null, EResponseCodes.FAIL, "No se pudieron encontrar roles para sistema");
+            return new ApiTransactionResponse(null, EResponseCodes.FAIL, "No se pudieron encontrar roles para sistema");
 
-        return new ApiResponse(getRoles, EResponseCodes.OK, "Roles obtenidos");
+        return new ApiTransactionResponse(getRoles, EResponseCodes.OK, "Roles obtenidos");
 
     }
 

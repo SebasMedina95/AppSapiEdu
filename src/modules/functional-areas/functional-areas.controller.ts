@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,
+         Get,
+         Post,
+         Body,
+         Patch,
+         Param,
+         Delete } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { FunctionalAreasService } from './functional-areas.service';
+
 import { CreateFunctionalAreaDto } from './dto/create-functional-area.dto';
 import { UpdateFunctionalAreaDto } from './dto/update-functional-area.dto';
 
+@ApiTags("Módulo de Áreas Funcionales")
 @Controller('functional-areas')
 export class FunctionalAreasController {
   constructor(private readonly functionalAreasService: FunctionalAreasService) {}

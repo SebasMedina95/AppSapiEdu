@@ -18,7 +18,7 @@ export interface IPagingData<T> {
     meta: IDataPaging;
 }
 
-export class ApiResponse<T> {
+export class ApiTransactionResponse<T> {
     data: T;
     operation: IOperation;
 

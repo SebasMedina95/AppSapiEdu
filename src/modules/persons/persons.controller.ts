@@ -5,6 +5,8 @@ import { Controller,
          Patch,
          Param,
          Delete } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { PersonsService } from './persons.service';
 
 import { CreatePersonDto } from './dto/create-person.dto';
@@ -12,13 +14,14 @@ import { UpdatePersonDto } from './dto/update-person.dto';
 import { PageOptionsDto } from 'src/helpers/paginations/dto/page-options.dto';
 import { PageDto } from 'src/helpers/paginations/dto/page.dto';
 
-import { ApiResponse } from 'src/utils/ApiResponse';
+import { ApiTransactionResponse } from 'src/utils/ApiResponse';
 
 import { IPerson } from './interfaces/person.interfaces';
 import { IUser } from '../auth/interfaces/user.interface';
 import { Auth } from '../auth/decorators/auth-protected.decorator';
 import { MyGetUserDecorator } from '../auth/decorators/get-user.decorator';
 
+@ApiTags("Módulo de Personas")
 @Controller('persons')
 export class PersonsController {
 
@@ -29,7 +32,7 @@ export class PersonsController {
   create(
     @Body() createPersonDto: CreatePersonDto,
     @MyGetUserDecorator() user: IUser
-  ): Promise<ApiResponse<IPerson | string>> {
+  ): Promise<ApiTransactionResponse<IPerson | string>> {
 
     return this.personsService.create(createPersonDto, user);
 
@@ -49,7 +52,7 @@ export class PersonsController {
   @Auth('PERSONS')
   async findOne(
     @Param('id') id: number
-  ): Promise<ApiResponse<IPerson | string>> {
+  ): Promise<ApiTransactionResponse<IPerson | string>> {
 
     return this.personsService.findOne(id);
 
@@ -61,7 +64,7 @@ export class PersonsController {
     @Param('id') id: number, 
     @Body() updatePersonDto: UpdatePersonDto,
     @MyGetUserDecorator() user: IUser
-  ): Promise<ApiResponse<IPerson | string>> {
+  ): Promise<ApiTransactionResponse<IPerson | string>> {
 
     return this.personsService.update(id, updatePersonDto, user);
 
@@ -71,7 +74,7 @@ export class PersonsController {
   @Auth('PERSONS')
   remove(
     @Param('id') id: number
-  ): Promise<ApiResponse<IPerson | string>> {
+  ): Promise<ApiTransactionResponse<IPerson | string>> {
 
     return this.personsService.remove(id);
 

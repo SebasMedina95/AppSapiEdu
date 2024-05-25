@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,
+         Get,
+         Post,
+         Body,
+         Patch,
+         Param,
+         Delete } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { ControlEntitiesService } from './control-entities.service';
+
 import { CreateControlEntityDto } from './dto/create-control-entity.dto';
 import { UpdateControlEntityDto } from './dto/update-control-entity.dto';
 
+@ApiTags("Módulo de Entidades")
 @Controller('control-entities')
 export class ControlEntitiesController {
   constructor(private readonly controlEntitiesService: ControlEntitiesService) {}

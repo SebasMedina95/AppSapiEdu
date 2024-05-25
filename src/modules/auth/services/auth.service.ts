@@ -9,7 +9,7 @@ import { RecoveryUserDto } from '../dto/recovery/recovery-user.dto';
 
 import { User } from '../entities/user.entity';
 
-import { ApiResponse } from 'src/utils/ApiResponse';
+import { ApiTransactionResponse } from 'src/utils/ApiResponse';
 import { EResponseCodes } from 'src/constants/ResponseCodesEnum';
 import { IUser, IUserAuthenticated } from '../interfaces/user.interface';
 import { IJwtPayload } from '../interfaces/jwt-payload.interface';
@@ -28,7 +28,7 @@ export class AuthService {
 
   ){}
 
-  async login(createAuthDto: CreateAuthDto): Promise<ApiResponse<IUserAuthenticated | null>> {
+  async login(createAuthDto: CreateAuthDto): Promise<ApiTransactionResponse<IUserAuthenticated | null>> {
 
     const queryBuilder = this.userRepository.createQueryBuilder("user");
     queryBuilder.where("user.user = :username", { username : createAuthDto.user });
@@ -54,16 +54,16 @@ export class AuthService {
 
     //Realizamos el juego de validaciones requeridas para el login
     if( !entities || entities.length === 0 )
-      return new ApiResponse(null, EResponseCodes.FAIL, "Error de acceso, usuario no encontrado");
+      return new ApiTransactionResponse(null, EResponseCodes.FAIL, "Error de acceso, usuario no encontrado");
 
     if( !entities[0].status )
-      return new ApiResponse(null, EResponseCodes.FAIL, "Error de acceso, usuario inhabilitado");
+      return new ApiTransactionResponse(null, EResponseCodes.FAIL, "Error de acceso, usuario inhabilitado");
 
     if( !entities[0].isValid )
-      return new ApiResponse(null, EResponseCodes.FAIL, "Error de acceso, usuario no ha sido verificado");
+      return new ApiTransactionResponse(null, EResponseCodes.FAIL, "Error de acceso, usuario no ha sido verificado");
 
     if( !bcrypt.compareSync(createAuthDto.password, entities[0].password) )
-      return new ApiResponse(null, EResponseCodes.FAIL, "Error de acceso, contraseña incorrecta");
+      return new ApiTransactionResponse(null, EResponseCodes.FAIL, "Error de acceso, contraseña incorrecta");
 
     //Si pasamos por acá, quiere decir que generamos el Token
     const getUser: IUser = entities[0] as IUser;
@@ -74,11 +74,11 @@ export class AuthService {
       token: this.getJwtToken({ idUser : Number(getUser.id) })
     }
 
-    return new ApiResponse(objAuthenticated, EResponseCodes.OK, "Ingresamos al sistema");
+    return new ApiTransactionResponse(objAuthenticated, EResponseCodes.OK, "Ingresamos al sistema");
 
   }
 
-  async recovery(recoveryUserDto: RecoveryUserDto): Promise<ApiResponse<IUser | null>> {
+  async recovery(recoveryUserDto: RecoveryUserDto): Promise<ApiTransactionResponse<IUser | null>> {
 
     console.log({recoveryUserDto});
     return null;
@@ -92,9 +92,9 @@ export class AuthService {
 
   }
 
-  async testingPrivateRoute(): Promise<ApiResponse<any>> {
+  async testingPrivateRoute(): Promise<ApiTransactionResponse<any>> {
 
-    return new ApiResponse(null, EResponseCodes.INFO, "Saludos desde un método privado!");
+    return new ApiTransactionResponse(null, EResponseCodes.INFO, "Saludos desde un método privado!");
 
   }
 

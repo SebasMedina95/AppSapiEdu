@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { dataSourceOptions } from './config/database/data-source';
@@ -18,6 +19,7 @@ import { PosPreOriginModule } from './modules/pos-pre-origin/pos-pre-origin.modu
 import { PosPreSapiModule } from './modules/pos-pre-sapi/pos-pre-sapi.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { RoleModule } from './helpers/roles/valid-roles.module';
+import { join } from 'path';
 
 
 @Module({
@@ -25,6 +27,11 @@ import { RoleModule } from './helpers/roles/valid-roles.module';
 
     //? Configuración Global
     ConfigModule.forRoot({ isGlobal: true }),
+
+    //? Servidor Estático
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
 
     //? Configuración del TypeORM y PostgreSQL
     TypeOrmModule.forRoot(dataSourceOptions),

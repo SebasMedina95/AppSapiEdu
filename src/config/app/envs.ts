@@ -6,6 +6,7 @@ export const envs = {
 
     //*** PUERTO DE LA APLICACIÓN ***//
     PORT: get('PORT').required().asPortNumber(),
+    STAGE: get('STAGE').required().asString(),
 
     //*** CONFIGURACIÓN BASE DE DATOS ***//
     DB_USER: get('DB_USER').required().asString(),

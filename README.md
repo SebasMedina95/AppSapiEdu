@@ -32,6 +32,12 @@ $ npm run seed
 $ npm run start:dev
 ```
 
+## DOCUMENTACIÓN ##
+Una vez instalada la aplicación, puede acceder a la documentación de los End Point ingresando a la siguiente URL:
+```bash
+http://localhost:3333/api/
+```
+
 
 ## ``INFORMACIÓN ADICIONAL IMPORTANTE`` ##
 ## CREACIÓN Y EJECUCIÓN DE MIGRACIONES ##

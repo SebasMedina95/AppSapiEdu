@@ -9,7 +9,7 @@ import { PageDto } from 'src/helpers/paginations/dto/page.dto';
 import { PageMetaDto } from 'src/helpers/paginations/dto/page-meta.dto';
 
 import { MySqlErrorsExceptions } from 'src/helpers/exceptions-sql';
-import { ApiResponse } from 'src/utils/ApiResponse';
+import { ApiTransactionResponse } from 'src/utils/ApiResponse';
 
 import { Person } from './entities/person.entity';
 
@@ -30,7 +30,7 @@ export class PersonsService {
 
   ){}
 
-  async create(createPersonDto: CreatePersonDto, user: IUser): Promise<ApiResponse<IPerson | string>> {
+  async create(createPersonDto: CreatePersonDto, user: IUser): Promise<ApiTransactionResponse<IPerson | string>> {
     
     try {
 
@@ -44,7 +44,7 @@ export class PersonsService {
       });
       await this.personRepository.save(createPerson);
       
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         createPerson,
         EResponseCodes.OK,
         "Persona creada correctamente."
@@ -54,7 +54,7 @@ export class PersonsService {
       
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "No se pudo crear la persona."
@@ -107,7 +107,7 @@ export class PersonsService {
     
   }
 
-  async findOne(id: number): Promise<ApiResponse<IPerson | string>> {
+  async findOne(id: number): Promise<ApiTransactionResponse<IPerson | string>> {
     
     try {
       
@@ -131,7 +131,7 @@ export class PersonsService {
 
       if( result.length === 0 ){
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           null,
           EResponseCodes.INFO,
           "Persona no encontrada con el ID."
@@ -139,7 +139,7 @@ export class PersonsService {
 
       }else{
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           result[0],
           EResponseCodes.OK,
           "Persona obtenida correctamente."
@@ -151,7 +151,7 @@ export class PersonsService {
       
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "Ocurrió un error al intentar encontrar a la persona por ID."
@@ -161,7 +161,7 @@ export class PersonsService {
     
   }
 
-  async update(id: number, updatePersonDto: UpdatePersonDto, user: IUser): Promise<ApiResponse<IPerson | string>> {
+  async update(id: number, updatePersonDto: UpdatePersonDto, user: IUser): Promise<ApiTransactionResponse<IPerson | string>> {
     
     try {
       
@@ -170,7 +170,7 @@ export class PersonsService {
       
       if( getPerson.data == null ){
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           null,
           EResponseCodes.INFO,
           "Persona no encontrada con el ID."
@@ -187,7 +187,7 @@ export class PersonsService {
 
       await this.personRepository.save(updatePerson);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         updatePerson,
         EResponseCodes.OK,
         "Persona actualizada correctamente."
@@ -197,7 +197,7 @@ export class PersonsService {
 
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "No se pudo actualizar la persona."
@@ -207,7 +207,7 @@ export class PersonsService {
     
   }
 
-  async remove(id: number): Promise<ApiResponse<IPerson | string>> {
+  async remove(id: number): Promise<ApiTransactionResponse<IPerson | string>> {
     
     try {
       
@@ -215,7 +215,7 @@ export class PersonsService {
       
       if( getPerson.data == null ){
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           null,
           EResponseCodes.INFO,
           "Persona no encontrada con el ID."
@@ -231,7 +231,7 @@ export class PersonsService {
 
       await this.personRepository.save(updatePerson);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         updatePerson,
         EResponseCodes.OK,
         "Persona eliminada correctamente."
@@ -241,7 +241,7 @@ export class PersonsService {
 
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "No se pudo eliminar lógicamente a la persona."

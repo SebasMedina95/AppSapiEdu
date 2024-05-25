@@ -9,7 +9,7 @@ import { Campus } from './entities/campus.entity';
 import { Person } from '../persons/entities/person.entity';
 
 import { EResponseCodes } from 'src/constants/ResponseCodesEnum';
-import { ApiResponse } from 'src/utils/ApiResponse';
+import { ApiTransactionResponse } from 'src/utils/ApiResponse';
 
 import { PageOptionsDto } from 'src/helpers/paginations/dto/page-options.dto';
 import { PageDto } from 'src/helpers/paginations/dto/page.dto';
@@ -31,7 +31,7 @@ export class CampusService {
     private readonly dataSource: DataSource,
   ){}
 
-  async create(createCampusDto: CreateCampusDto, user: IUser): Promise<ApiResponse<ICampus | string>> {
+  async create(createCampusDto: CreateCampusDto, user: IUser): Promise<ApiTransactionResponse<ICampus | string>> {
     
     try {
 
@@ -46,7 +46,7 @@ export class CampusService {
 
       await this.campusRepository.save(registerCampus);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         registerCampus,
         EResponseCodes.OK,
         "Campus creado correctamente."
@@ -102,7 +102,7 @@ export class CampusService {
       
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "Ocurrió un error a intentar listar las sedes/campus."
@@ -112,7 +112,7 @@ export class CampusService {
     
   }
 
-  async findOne(id: number): Promise<ApiResponse<ICampus | string>> {
+  async findOne(id: number): Promise<ApiTransactionResponse<ICampus | string>> {
     
     try {
 
@@ -126,7 +126,7 @@ export class CampusService {
 
       if( result.length === 0 ){
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           null,
           EResponseCodes.INFO,
           "Campus/Sede no encontrada con el ID."
@@ -134,7 +134,7 @@ export class CampusService {
 
       }else{
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           result[0],
           EResponseCodes.OK,
           "Campus/Sede obtenida correctamente."
@@ -146,7 +146,7 @@ export class CampusService {
 
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "Ocurrió un error a intentar encontrar la sede/campus."
@@ -156,7 +156,7 @@ export class CampusService {
     
   }
 
-  async update(id: number, updateCampusDto: UpdateCampusDto, user: IUser): Promise<ApiResponse<ICampus | string>> {
+  async update(id: number, updateCampusDto: UpdateCampusDto, user: IUser): Promise<ApiTransactionResponse<ICampus | string>> {
     
     try {
 
@@ -165,7 +165,7 @@ export class CampusService {
       
       if( getCampus.data == null || !getCampus.data ){
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           null,
           EResponseCodes.INFO,
           "Sede/Campus no encontrada con el ID."
@@ -182,7 +182,7 @@ export class CampusService {
 
       await this.campusRepository.save(updateCampus);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         updateCampus,
         EResponseCodes.OK,
         "Sede/Campus actualizado correctamente."
@@ -192,7 +192,7 @@ export class CampusService {
 
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "Ocurrió un error a intentar actualizar la sede/campus."
@@ -202,7 +202,7 @@ export class CampusService {
 
   }
 
-  async remove(id: number): Promise<ApiResponse<ICampus | string>> {
+  async remove(id: number): Promise<ApiTransactionResponse<ICampus | string>> {
     
     try {
 
@@ -210,7 +210,7 @@ export class CampusService {
       
       if( getCampus.data == null || !getCampus.data ){
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           null,
           EResponseCodes.INFO,
           "Sede/Campus no encontrada con el ID."
@@ -227,7 +227,7 @@ export class CampusService {
 
       await this.campusRepository.save(updateCampus);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         updateCampus,
         EResponseCodes.OK,
         "Sede/Campus eliminado correctamente."
@@ -237,7 +237,7 @@ export class CampusService {
 
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "Ocurrió un error a intentar eliminar lógicamente la sede/campus."
@@ -301,7 +301,7 @@ export class CampusService {
       
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "Ocurrió un error a intentar listar las sedes/campus."

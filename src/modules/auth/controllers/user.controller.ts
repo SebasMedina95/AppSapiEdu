@@ -10,19 +10,21 @@ import { Controller,
          ParseFilePipe,
          MaxFileSizeValidator,
          FileTypeValidator} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { UserService } from '../services/user.service';
 
 import { CreateUserDto } from '../dto/create/create-user.dto';
 import { UpdateUserDto } from '../dto/update/update-user.dto';
 import { PageOptionsDto } from 'src/helpers/paginations/dto/page-options.dto';
+import { PageDto } from 'src/helpers/paginations/dto/page.dto';
 
 import { IEditUserWithUploadAvatarFile, IResponseTransactionBasic, IUser } from '../interfaces/user.interface';
-import { ApiResponse } from 'src/utils/ApiResponse';
-import { PageDto } from 'src/helpers/paginations/dto/page.dto';
+import { ApiTransactionResponse } from 'src/utils/ApiResponse';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from 'src/helpers/files/files.service';
-import { CloudinaryResponse } from 'src/helpers/files/files-response';
 
+@ApiTags("Módulo de Usuarios")
 @Controller('user')
 export class UserController {
   
@@ -34,7 +36,7 @@ export class UserController {
   @Post('/create')
   async create(
     @Body() createUserDto: CreateUserDto
-  ): Promise<ApiResponse<IResponseTransactionBasic | string>> {
+  ): Promise<ApiTransactionResponse<IResponseTransactionBasic | string>> {
 
     return this.userService.create(createUserDto);
 
@@ -52,7 +54,7 @@ export class UserController {
   @Get('/get-by-id/:id')
   async findOne(
     @Param('id') id: number
-  ): Promise<ApiResponse<IUser | string>> {
+  ): Promise<ApiTransactionResponse<IUser | string>> {
 
     return this.userService.findOne(id);
 
@@ -77,7 +79,7 @@ export class UserController {
     let url_cloudinary: string = "";
 
     //Obtengamos el usuario:
-    const getUser: ApiResponse<IUser | string> = await this.userService.findOne(id);
+    const getUser: ApiTransactionResponse<IUser | string> = await this.userService.findOne(id);
     const user = getUser.data as IUser;
     let objReg: IEditUserWithUploadAvatarFile;
 
@@ -136,7 +138,7 @@ export class UserController {
   @Delete('/remove-logic/:id')
   async remove(
     @Param('id') id: number
-  ): Promise<ApiResponse<IUser | string>> {
+  ): Promise<ApiTransactionResponse<IUser | string>> {
 
     return this.userService.remove(id);
 
@@ -145,7 +147,7 @@ export class UserController {
   @Get('/validate-email/:id')
   async validateEmail(
     @Param('id') id: number
-  ): Promise<ApiResponse<boolean | string>> {
+  ): Promise<ApiTransactionResponse<boolean | string>> {
 
     return this.userService.validateEmail(id);
 

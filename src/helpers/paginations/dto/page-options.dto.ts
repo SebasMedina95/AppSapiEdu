@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsEnum,
          IsInt,
@@ -14,16 +15,19 @@ export enum Order {
 
 export class PageOptionsDto {
 
+    @ApiProperty({ example: "ASC", description: 'Ordenamiento de resultado' })
     @IsEnum(Order)
     @IsOptional()
     readonly order?: Order = Order.ASC;
 
+    @ApiProperty({ example: 1, description: 'Página actual' })
     @Type(() => Number)
     @IsInt()
     @Min(1)
     @IsOptional()
     readonly page?: number = 1;
 
+    @ApiProperty({ example: 10, description: 'Cantidad por página' })
     @Type(() => Number)
     @IsInt()
     @Min(1)
@@ -31,6 +35,7 @@ export class PageOptionsDto {
     @IsOptional()
     readonly take?: number = 10;
 
+    @ApiProperty({ example: "sede", description: 'Parámetro de busqueda para filtrar' })
     @Type(() => String)
     @IsString()
     @IsOptional()

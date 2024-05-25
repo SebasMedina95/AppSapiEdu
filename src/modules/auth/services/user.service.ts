@@ -19,7 +19,7 @@ import { IEditUserWithUploadAvatarFile, IResponseTransactionBasic, IUser, IUserW
 import { IPerson } from 'src/modules/persons/interfaces/person.interfaces';
 
 import { MySqlErrorsExceptions } from 'src/helpers/exceptions-sql';
-import { ApiResponse } from 'src/utils/ApiResponse';
+import { ApiTransactionResponse } from 'src/utils/ApiResponse';
 import { EResponseCodes } from 'src/constants/ResponseCodesEnum';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class UserService {
 
   ){}
 
-  async create(createUserDto: CreateUserDto): Promise<ApiResponse<IResponseTransactionBasic | string>> {
+  async create(createUserDto: CreateUserDto): Promise<ApiTransactionResponse<IResponseTransactionBasic | string>> {
     
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -57,7 +57,7 @@ export class UserService {
       const entitiesForGetPerson = entitiesUnk as IUser[];
 
       if( entitiesForGetPerson && entitiesForGetPerson.length != 0 )
-        return new ApiResponse(null, EResponseCodes.FAIL, `La persona determinada ya tiene un usuario creado (${entitiesForGetPerson[0].user}).`);
+        return new ApiTransactionResponse(null, EResponseCodes.FAIL, `La persona determinada ya tiene un usuario creado (${entitiesForGetPerson[0].user}).`);
      
       //Construcción de objeto usuario para insersión
       //Realizamos la primera parte que es insertar al usuario
@@ -77,7 +77,7 @@ export class UserService {
       //Si hay error cancelo la operación
       if( !resUser ) {
         await queryRunner.rollbackTransaction();
-        return new ApiResponse(null, EResponseCodes.FAIL, "Fallo la transacción de creación.");
+        return new ApiTransactionResponse(null, EResponseCodes.FAIL, "Fallo la transacción de creación.");
       }
 
       //Si pasa el proceso anterior, ahora registramos los roles del usuario
@@ -121,7 +121,7 @@ export class UserService {
                                                       createUserDto.user,
                                                       createUserDto.password);
 
-      return new ApiResponse(factoryResult, EResponseCodes.OK, "Usuario creado correctamente.");
+      return new ApiTransactionResponse(factoryResult, EResponseCodes.OK, "Usuario creado correctamente.");
       
     } catch (error) {
 
@@ -130,7 +130,7 @@ export class UserService {
 
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "No se pudo crear el usuario."
@@ -196,7 +196,7 @@ export class UserService {
 
   }
 
-  async findOne(id: number): Promise<ApiResponse<IUser | string>> {
+  async findOne(id: number): Promise<ApiTransactionResponse<IUser | string>> {
     
     try {
       
@@ -226,7 +226,7 @@ export class UserService {
 
       if( result.length === 0 ){
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           null,
           EResponseCodes.INFO,
           "Usuario no encontrado con el ID."
@@ -236,7 +236,7 @@ export class UserService {
 
         delete result[0].password; //No devolvemos la contraseña
 
-        return new ApiResponse(
+        return new ApiTransactionResponse(
           result[0],
           EResponseCodes.OK,
           "Usuario obtenido correctamente."
@@ -248,7 +248,7 @@ export class UserService {
       
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "Ocurrió un error al intentar encontrar a la persona por ID."
@@ -258,15 +258,15 @@ export class UserService {
 
   }
 
-  async update(data: IEditUserWithUploadAvatarFile): Promise<ApiResponse<IUser | string>> {
+  async update(data: IEditUserWithUploadAvatarFile): Promise<ApiTransactionResponse<IUser | string>> {
 
     try {
 
       //Encontremos primero el usuario por el ID
-      const getUser: ApiResponse<string | IUser> = await this.findOne(Number(data.id));
+      const getUser: ApiTransactionResponse<string | IUser> = await this.findOne(Number(data.id));
 
       if( getUser.data == null )
-        return new ApiResponse(null, EResponseCodes.FAIL, "El usuario no pudo ser encontrado.");
+        return new ApiTransactionResponse(null, EResponseCodes.FAIL, "El usuario no pudo ser encontrado.");
 
       const updateUser = await this.userRepository.preload({
         id: Number(data.id),
@@ -279,7 +279,7 @@ export class UserService {
 
       await this.userRepository.save(updateUser);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         updateUser,
         EResponseCodes.OK,
         "Usuario actualizado correctamente."
@@ -289,7 +289,7 @@ export class UserService {
 
       const fail: string = await this.errorsSQL.handleDbExceptions(error);
 
-      return new ApiResponse(
+      return new ApiTransactionResponse(
         fail,
         EResponseCodes.FAIL,
         "No se pudo actualizar el usuario."
@@ -299,13 +299,13 @@ export class UserService {
 
   }
 
-  async remove(id: number): Promise<ApiResponse<IUser | string>> {
+  async remove(id: number): Promise<ApiTransactionResponse<IUser | string>> {
     
     //Encontremos primero el usuario por el ID
-    const getUser: ApiResponse<string | IUser> = await this.findOne(id);
+    const getUser: ApiTransactionResponse<string | IUser> = await this.findOne(id);
 
     if( getUser.data == null )
-      return new ApiResponse(null, EResponseCodes.FAIL, "El usuario no pudo ser encontrado.");
+      return new ApiTransactionResponse(null, EResponseCodes.FAIL, "El usuario no pudo ser encontrado.");
 
     //Ajustemos entonces el campo requerido
     const updateStatus = await this.userRepository.preload({
@@ -317,7 +317,7 @@ export class UserService {
 
     await this.userRepository.save(updateStatus);
 
-    return new ApiResponse(
+    return new ApiTransactionResponse(
       updateStatus,
       EResponseCodes.OK,
       "El usuario ha sido inhabilitado correctamente."
@@ -325,13 +325,13 @@ export class UserService {
     
   }
 
-  async validateEmail(id: number): Promise<ApiResponse<boolean | string>> {
+  async validateEmail(id: number): Promise<ApiTransactionResponse<boolean | string>> {
 
     //Encontremos primero el usuario por el ID
-    const getUser: ApiResponse<string | IUser> = await this.findOne(id);
+    const getUser: ApiTransactionResponse<string | IUser> = await this.findOne(id);
 
     if( getUser.data == null )
-      return new ApiResponse(null, EResponseCodes.FAIL, "El usuario no pudo ser encontrado.");
+      return new ApiTransactionResponse(null, EResponseCodes.FAIL, "El usuario no pudo ser encontrado.");
 
     //Ajustemos entonces el campo requerido
     const updateValidEmail = await this.userRepository.preload({
@@ -343,7 +343,7 @@ export class UserService {
 
     await this.userRepository.save(updateValidEmail);
 
-    return new ApiResponse(
+    return new ApiTransactionResponse(
       true,
       EResponseCodes.OK,
       "Email de usuario validado correctamente."

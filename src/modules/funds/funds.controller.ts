@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,
+         Get,
+         Post,
+         Body,
+         Patch,
+         Param,
+         Delete } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { FundsService } from './funds.service';
+
 import { CreateFundDto } from './dto/create-fund.dto';
 import { UpdateFundDto } from './dto/update-fund.dto';
 
+@ApiTags("Módulo de Fondos")
 @Controller('funds')
 export class FundsController {
   constructor(private readonly fundsService: FundsService) {}

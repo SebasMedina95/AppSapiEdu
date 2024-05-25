@@ -6,7 +6,7 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import { Repository } from "typeorm";
 
 import { User } from "../entities/user.entity";
-import { ApiResponse } from "src/utils/ApiResponse";
+import { ApiTransactionResponse } from "src/utils/ApiResponse";
 import { IJwtPayload } from "../interfaces/jwt-payload.interface";
 import { EResponseCodes } from "src/constants/ResponseCodesEnum";
 
@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy( Strategy ){
     }
 
     //Recibimos lo que tendremos a nivel del JWT
-    async validate(payload : IJwtPayload): Promise<ApiResponse<User | UnauthorizedException>> {
+    async validate(payload : IJwtPayload): Promise<ApiTransactionResponse<User | UnauthorizedException>> {
 
         const { idUser } = payload;
 
@@ -52,7 +52,7 @@ export class JwtStrategy extends PassportStrategy( Strategy ){
         if( !entities[0].isValid ) 
             throw new UnauthorizedException("El email del usuario no está validado. Hable con el administrador.");
 
-        return new ApiResponse(entities[0], EResponseCodes.OK, "Usuario obtenido.");
+        return new ApiTransactionResponse(entities[0], EResponseCodes.OK, "Usuario obtenido.");
 
     }
 
