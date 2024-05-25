@@ -3,7 +3,7 @@ import { Controller,
          Body, 
          Get
         } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from '../services/auth.service';
 
@@ -12,8 +12,7 @@ import { RecoveryUserDto } from '../dto/recovery/recovery-user.dto';
 
 import { ApiTransactionResponse } from 'src/utils/ApiResponse';
 import { IUser, IUserAuthenticated } from '../interfaces/user.interface';
-import { MyGetUserDecorator } from '../decorators/get-user.decorator';
-import { Auth } from '../decorators/auth-protected.decorator';
+import { UserComplementaryResponse } from '../doc/ResponseUser';
 
 @ApiTags("Módulo de Autenticación/Autorización")
 @Controller('auth')
@@ -21,6 +20,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/login')
+  @ApiResponse({ status: 200, description: "Usuario logeado correctamente", type: UserComplementaryResponse })
+  @ApiResponse({ status: 400, description: "Problemas con los campos que se están enviando" })
+  @ApiResponse({ status: 500, description: "Error en la generación del Token" })
   async login(
     @Body() createAuthDto: CreateAuthDto
   ): Promise<ApiTransactionResponse<IUserAuthenticated | null>> {
@@ -38,15 +40,14 @@ export class AuthController {
 
   }
 
-  @Get('/test-private-route')
-  @Auth('AUTH')
-  testingPrivateRoute(
-    @MyGetUserDecorator() user: IUser
-  ): Promise<ApiTransactionResponse<string | null>> {
+  // @Get('/test-private-route')
+  // @Auth('AUTH')
+  // testingPrivateRoute(
+  //   @MyGetUserDecorator() user: IUser
+  // ): Promise<ApiTransactionResponse<string | null>> {
 
-    // console.log({ user });
-    return this.authService.testingPrivateRoute();
+  //   return this.authService.testingPrivateRoute();
 
-  }
+  // }
 
 }

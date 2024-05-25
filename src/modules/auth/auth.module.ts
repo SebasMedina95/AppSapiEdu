@@ -44,6 +44,7 @@ import { Person } from '../persons/entities/person.entity';
       PermitAssignment,
       Person 
     ]),
+    AuthModule,
 
     //Configuraciones para el Auth
     PassportModule.register({

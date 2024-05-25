@@ -10,7 +10,8 @@ import { Controller,
          ParseFilePipe,
          MaxFileSizeValidator,
          FileTypeValidator} from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { UserService } from '../services/user.service';
 
@@ -21,8 +22,11 @@ import { PageDto } from 'src/helpers/paginations/dto/page.dto';
 
 import { IEditUserWithUploadAvatarFile, IResponseTransactionBasic, IUser } from '../interfaces/user.interface';
 import { ApiTransactionResponse } from 'src/utils/ApiResponse';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from 'src/helpers/files/files.service';
+import { Auth } from '../decorators/auth-protected.decorator';
+
+import { UserResponse, UserSimpleResponse } from '../doc/ResponseUser';
+import { PageUserDto } from '../doc/PageUserDto';
 
 @ApiTags("Módulo de Usuarios")
 @Controller('user')
@@ -34,6 +38,10 @@ export class UserController {
   ) {}
 
   @Post('/create')
+  @Auth('AUTH')
+  @ApiResponse({ status: 201, description: "Usuario creado correctamente", type: UserResponse })
+  @ApiResponse({ status: 400, description: "Problemas con los campos que se están enviando" })
+  @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async create(
     @Body() createUserDto: CreateUserDto
   ): Promise<ApiTransactionResponse<IResponseTransactionBasic | string>> {
@@ -43,6 +51,10 @@ export class UserController {
   }
 
   @Get('/get-paginated')
+  @Auth('AUTH')
+  @ApiResponse({ status: 200, description: "Obteniendo el listado de usuarios", type: PageUserDto })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener el listado de usuarios" })
+  @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async findAll(
     @Body() pageOptionsDto: PageOptionsDto
   ): Promise<PageDto<IUser>> {
@@ -52,6 +64,11 @@ export class UserController {
   }
 
   @Get('/get-by-id/:id')
+  @Auth('AUTH')
+  @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id del usuario a obtener' })
+  @ApiResponse({ status: 200, description: "Usuario obtenido correctamente", type: UserResponse })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener un usuario" })
+  @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async findOne(
     @Param('id') id: number
   ): Promise<ApiTransactionResponse<IUser | string>> {
@@ -61,6 +78,12 @@ export class UserController {
   }
 
   @Post('/update/:id')
+  @Auth('AUTH')
+  @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id del usuario a actualizar' })
+  @ApiResponse({ status: 200, description: "Usuario actualizado correctamente", type: UserResponse })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener un usuario para actualizarlo" })
+  @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
+  @ApiResponse({ status: 500, description: "Error en la comunicación con Cloudinary" })
   @UseInterceptors( FileInterceptor('avatar') )
   async update(
     @UploadedFile(
@@ -136,6 +159,11 @@ export class UserController {
   }
 
   @Delete('/remove-logic/:id')
+  @Auth('AUTH')
+  @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id del usuario a eliminar' })
+  @ApiResponse({ status: 200, description: "Usuario eliminado lógicamente correctamente", type: UserResponse })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener un usuario para eliminarlo" })
+  @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async remove(
     @Param('id') id: number
   ): Promise<ApiTransactionResponse<IUser | string>> {
@@ -145,6 +173,10 @@ export class UserController {
   }
 
   @Get('/validate-email/:id')
+  @Auth('AUTH')
+  @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id del usuario a eliminar' })
+  @ApiResponse({ status: 200, description: "Email de verificación enviado correctamente", type: UserSimpleResponse })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener un usuario para eliminarlo" })
   async validateEmail(
     @Param('id') id: number
   ): Promise<ApiTransactionResponse<boolean | string>> {

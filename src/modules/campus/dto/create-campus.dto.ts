@@ -85,20 +85,40 @@ export class CreateCampusDto {
     @IsBoolean()
     status: boolean;
 
+    @ApiProperty({
+        example: "123456789",
+        description: "Documento de la persona/usuario que creó",
+        required: false,
+    })
     @IsString()
     @MinLength(1)
     @IsOptional()
     createDocumentUserAt: string;
 
+    @ApiProperty({
+        example: "2024-05-25",
+        description: "Fecha de creación del registro",
+        required: false,
+    })
     @IsDate()
     @IsOptional()
     createDateAt: Date;
 
+    @ApiProperty({
+        example: "123456789",
+        description: "Documento de la persona/usuario que actualizó",
+        required: false,
+    })
     @IsString()
     @MinLength(1)
     @IsOptional()
     updateDocumentUserAt: string;
 
+    @ApiProperty({
+        example: "2024-05-25",
+        description: "Fecha de actualización del registro",
+        required: false,
+    })
     @IsDate()
     @IsOptional()
     updateDateAt: Date;
