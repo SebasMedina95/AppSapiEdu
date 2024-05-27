@@ -156,13 +156,13 @@ export class Person {
 
     @ApiProperty({
         example: "A1",
-        description: "Tipo de persona",
+        description: "Tipo de persona (A1 por APP, A2 por PQRS, A3 por Otro)",
     })
     @Column({
         name: "PER_TIPO",
         type: 'varchar',
         length: 2,
-        comment: 'Tipo de persona'
+        comment: 'Tipo de persona (A1 por APP, A2 por PQRS, A3 por Otro)'
     })
     type: string;
 

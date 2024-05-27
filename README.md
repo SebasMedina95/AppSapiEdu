@@ -23,19 +23,23 @@ $ docker compose up -d
 $ npm run migration:run
 ```
 Posterior a este paso, corroboar en la base de datos la creación de las tablas.
-5. Ejecute el siguiente comando para llenar la información inicial de la base de datos, esto es una semilla de información preliminar para arrancar a usar los aspectos básicos del sistema, ejecute el comando:
+5. Ejecute el siguiente comando para llenar la información inicial de la base de datos, esto es una semilla de información preliminar para arrancar a usar los aspectos básicos del sistema, ejecute el siguiente END POINT usando el verbo POST (No requiere por ahora auth):
 ```bash
-$ npm run seed
+$ http://localhost:3333/api-sapiedu/v1/seed/execute-seed
 ```
 6. Ejecutar en modo desarrollo usando el comando:
 ```bash
 $ npm run start:dev
 ```
+7. Puede verificar que la aplicación este OK en la terminal o bien entrando al sitio:
+```bash
+$ http://localhost:3333/api-sapiedu
+```
 
 ## DOCUMENTACIÓN ##
 Una vez instalada la aplicación, puede acceder a la documentación de los End Point ingresando a la siguiente URL:
 ```bash
-http://localhost:3333/api/
+http://localhost:3333/api-sapiedu-documentation/
 ```
 
 
