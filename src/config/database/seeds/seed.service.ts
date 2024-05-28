@@ -14,6 +14,9 @@ import { Person } from "src/modules/persons/entities/person.entity";
 
 import { initialDataRoles } from "../core/roles.seed";
 import { initialDataCampus } from "../core/campus.seed";
+import { initialDataPersons } from "../core/persons.seed";
+import { initialDataUsers } from "../core/users.seed";
+import { initialDataPermits } from "../core/permits.seed";
 
 @Injectable()
 export class SeedService {
@@ -101,6 +104,16 @@ export class SeedService {
                 return new ApiTransactionResponse(null, EResponseCodes.FAIL, "La transacción del seed fallo en el registro de usuarios.");
             }
 
+            //* --------------------------------------------
+            //* 2.5 Registrar los permisos de los usuarios
+            //* --------------------------------------------
+            const resultPermitsUsers = await this.registerPermitUsers();
+            if( !resultPermitsUsers || resultPermitsUsers == null ){
+                this.logger.error(`${resultPermitsUsers}, realizando Rollback`);
+                await queryRunner.rollbackTransaction();
+                return new ApiTransactionResponse(null, EResponseCodes.FAIL, "La transacción del seed fallo en el registro de permisos de usuarios.");
+            }
+
             //Genero la transacción completa
             await queryRunner.commitTransaction();
 
@@ -178,7 +191,19 @@ export class SeedService {
 
     private async registerPersons(): Promise<string | null> {
 
-        return "OK"
+        try {
+
+            const persons = initialDataPersons.persons;
+            await this.personRepository.save(persons);
+
+            return "OK"
+
+        } catch (error) {
+
+            this.logger.warn(error);
+            return null;
+
+        }
 
     }
 
@@ -202,7 +227,19 @@ export class SeedService {
 
     private async registerUsers(): Promise<string | null> {
 
-        return "OK"
+        try {
+
+            const users = initialDataUsers.users;
+            await this.userRepository.save(users);
+
+            return "OK"
+
+        } catch (error) {
+
+            this.logger.warn(error);
+            return null;
+
+        }
 
     }
 
@@ -212,6 +249,24 @@ export class SeedService {
 
             const campus = initialDataCampus.campus;
             await this.campusRepository.save(campus);
+
+            return "OK"
+
+        } catch (error) {
+
+            this.logger.warn(error);
+            return null;
+
+        }
+
+    }
+
+    private async registerPermitUsers(): Promise<string | null> {
+
+        try {
+
+            const permits = initialDataPermits.permits;
+            await this.permitRepository.save(permits);
 
             return "OK"
 
