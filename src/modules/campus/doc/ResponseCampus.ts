@@ -19,5 +19,4 @@ export class CampusResponse {
     @ApiProperty({ type: MetaResponse, description: 'Meta Información' })
     meta: MetaResponse;
 
-
 }
