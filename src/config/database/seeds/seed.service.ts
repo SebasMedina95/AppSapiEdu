@@ -11,12 +11,14 @@ import { Role } from "src/modules/auth/entities/role.entity";
 import { User } from "src/modules/auth/entities/user.entity";
 import { Campus } from "src/modules/campus/entities/campus.entity";
 import { Person } from "src/modules/persons/entities/person.entity";
+import { ControlEntity } from "src/modules/control-entities/entities/control-entity.entity";
 
 import { initialDataRoles } from "../core/roles.seed";
 import { initialDataCampus } from "../core/campus.seed";
 import { initialDataPersons } from "../core/persons.seed";
 import { initialDataUsers } from "../core/users.seed";
 import { initialDataPermits } from "../core/permits.seed";
+import { initialDataControlEntities } from "../core/control-entities.seed";
 
 @Injectable()
 export class SeedService {
@@ -32,6 +34,7 @@ export class SeedService {
         @InjectRepository( Role ) private readonly roleRepository: Repository<Role>,
         @InjectRepository( PermitAssignment ) private readonly permitRepository: Repository<PermitAssignment>,
         @InjectRepository( Campus ) private readonly campusRepository: Repository<Campus>,
+        @InjectRepository( ControlEntity ) private readonly controlEntityRepository: Repository<ControlEntity>,
     ){}
 
     async executeSeedForDb(): Promise<ApiTransactionResponse<string | null>> {
@@ -114,6 +117,16 @@ export class SeedService {
                 return new ApiTransactionResponse(null, EResponseCodes.FAIL, "La transacción del seed fallo en el registro de permisos de usuarios.");
             }
 
+            //* --------------------------------------------
+            //* 2.6 Registrar entidades de control
+            //* --------------------------------------------
+            const resultEntityControl = await this.registerEntityControls();
+            if( !resultEntityControl || resultEntityControl == null ){
+                this.logger.error(`${resultEntityControl}, realizando Rollback`);
+                await queryRunner.rollbackTransaction();
+                return new ApiTransactionResponse(null, EResponseCodes.FAIL, "La transacción del seed fallo en el registro de entidades de control.");
+            }
+
             //Genero la transacción completa
             await queryRunner.commitTransaction();
 
@@ -163,12 +176,18 @@ export class SeedService {
         const queryBuilderCampus = this.campusRepository.createQueryBuilder();
         await queryBuilderCampus.delete().where({}).execute();
 
+        //* 6. Eliminamos entidades de control
+        const queryBuilderControlEntities = this.controlEntityRepository.createQueryBuilder();
+        await queryBuilderControlEntities.delete().where({}).execute();
+
         return "OK"
 
     }
 
     private async reseteSecuenceDb(): Promise<string | null> {
 
+        //? El va tomar todas las secuencias que encuentre y las va a reiniciar
+        //? por eso primero debemos localizarlas y ya luego vamos reiniciando una a una
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         const sequences = await queryRunner.query(`
@@ -267,6 +286,24 @@ export class SeedService {
 
             const permits = initialDataPermits.permits;
             await this.permitRepository.save(permits);
+
+            return "OK"
+
+        } catch (error) {
+
+            this.logger.warn(error);
+            return null;
+
+        }
+
+    }
+
+    private async registerEntityControls(): Promise<string | null> {
+
+        try {
+
+            const controlEntities = initialDataControlEntities.controlEntity;
+            await this.controlEntityRepository.save(controlEntities);
 
             return "OK"
 

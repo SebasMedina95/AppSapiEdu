@@ -13,6 +13,7 @@ import { Person } from 'src/modules/persons/entities/person.entity';
 import { Role } from 'src/modules/auth/entities/role.entity';
 import { PermitAssignment } from 'src/modules/auth/entities/permit-assignment.entity';
 import { Campus } from 'src/modules/campus/entities/campus.entity';
+import { ControlEntity } from 'src/modules/control-entities/entities/control-entity.entity';
 
 @Module({
   controllers: [SeedController],
@@ -24,6 +25,7 @@ import { Campus } from 'src/modules/campus/entities/campus.entity';
         Person,
         Role,
         User,
+        ControlEntity
       ]),
 
     AuthModule,

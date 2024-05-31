@@ -44,7 +44,7 @@ export class ControlEntitiesController {
 
   }
 
-  @Get()
+  @Get('/get-paginated')
   @Auth('CONTROL_ENTITIES')
   @ApiResponse({ status: 200, description: "Obteniendo el listado de Entidades de Control", type: PageControlEntityDto })
   @ApiResponse({ status: 400, description: "Problemas al intentar obtener el listado de Entidades de Control" })
@@ -57,7 +57,7 @@ export class ControlEntitiesController {
 
   }
 
-  @Get(':id')
+  @Get('/get-by-id/:id')
   @Auth('CONTROL_ENTITIES')
   @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id de la entidad de control a obtener' })
   @ApiResponse({ status: 200, description: "Entidad de Control obtenida correctamente", type: ControlEntityResponse })
@@ -71,7 +71,7 @@ export class ControlEntitiesController {
 
   }
 
-  @Patch(':id')
+  @Patch('/update/:id')
   @Auth('CONTROL_ENTITIES')
   @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id de la entidad de control a actualizar' })
   @ApiResponse({ status: 200, description: "Entidad de Control actualizada correctamente", type: ControlEntityResponse })
@@ -87,17 +87,18 @@ export class ControlEntitiesController {
 
   }
 
-  @Delete(':id')
+  @Delete('/remove-logic/:id')
   @Auth('CONTROL_ENTITIES')
   @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id de la entidad de control a eliminar' })
   @ApiResponse({ status: 200, description: "Entidad de Control eliminada lógicamente correctamente", type: ControlEntityResponse })
   @ApiResponse({ status: 400, description: "Problemas al intentar obtener una entidad de control para eliminarla" })
   @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async remove(
-    @Param('id') id: number
+    @Param('id') id: number,
+    @MyGetUserDecorator() user: IUser
   ): Promise<ApiTransactionResponse<IControlEntity | string>> {
 
-    return this.controlEntitiesService.remove(id);
+    return this.controlEntitiesService.remove(id, user);
 
   }
 }

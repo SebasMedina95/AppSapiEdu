@@ -74,7 +74,7 @@ export class CampusService {
       if( pageOptionsDto.search ){
 
         queryBuilder
-          .where("LOWER(campus.name) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .andWhere("LOWER(campus.name) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
           .orWhere("LOWER(campus.address) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
           .orWhere("LOWER(campus.phone1) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
           .orWhere("LOWER(campus.phone2) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
@@ -87,7 +87,6 @@ export class CampusService {
       }
 
       queryBuilder
-        .where("campus.status = true")
         .skip(pageOptionsDto.skip)
         .take(pageOptionsDto.take)
         .orderBy("campus.id", pageOptionsDto.order);
@@ -202,10 +201,14 @@ export class CampusService {
 
   }
 
-  async remove(id: number): Promise<ApiTransactionResponse<ICampus | string>> {
+  async remove(
+    id: number, 
+    user: IUser
+  ): Promise<ApiTransactionResponse<ICampus | string>> {
     
     try {
 
+      const personUser: IPerson = user.person as IPerson;
       const getCampus = await this.findOne(id);
       
       if( getCampus.data == null || !getCampus.data ){
@@ -221,7 +224,7 @@ export class CampusService {
       const updateCampus = await this.campusRepository.preload({
         id,
         status: false,
-        updateDocumentUserAt: "123456789",
+        updateDocumentUserAt: personUser.document,
         updateDateAt: new Date()
       })
 

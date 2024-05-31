@@ -67,6 +67,7 @@ export class PersonsService {
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<IPerson>> {
     
     const queryBuilder = this.personRepository.createQueryBuilder("person");
+    queryBuilder.where("person.status = true")
 
     //* ************************* *//
     //* Apliquemos las relaciones *//
@@ -81,7 +82,7 @@ export class PersonsService {
     if( pageOptionsDto.search ){
 
       queryBuilder
-        .where("LOWER(person.document) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .andWhere("LOWER(person.document) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
         .orWhere("LOWER(person.names) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
         .orWhere("LOWER(person.lastNames) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
         .orWhere("LOWER(person.address) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
@@ -94,7 +95,6 @@ export class PersonsService {
     }
 
     queryBuilder
-      .where("person.status = true")
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
       .orderBy("person.id", pageOptionsDto.order);
@@ -161,7 +161,11 @@ export class PersonsService {
     
   }
 
-  async update(id: number, updatePersonDto: UpdatePersonDto, user: IUser): Promise<ApiTransactionResponse<IPerson | string>> {
+  async update(
+    id: number, 
+    updatePersonDto: UpdatePersonDto, 
+    user: IUser
+  ): Promise<ApiTransactionResponse<IPerson | string>> {
     
     try {
       
@@ -207,10 +211,14 @@ export class PersonsService {
     
   }
 
-  async remove(id: number): Promise<ApiTransactionResponse<IPerson | string>> {
+  async remove(
+    id: number,
+    user: IUser
+  ): Promise<ApiTransactionResponse<IPerson | string>> {
     
     try {
       
+      const personUser: IPerson = user.person as IPerson;
       const getPerson = await this.findOne(id);
       
       if( getPerson.data == null ){
@@ -226,6 +234,7 @@ export class PersonsService {
       const updatePerson = await this.personRepository.preload({
         id,
         status: false,
+        updateDocumentUserAt: personUser.document,
         updateDateAt: new Date()
       })
 

@@ -95,9 +95,12 @@ export class CampusController {
   @ApiResponse({ status: 200, description: "Campus eliminado lógicamente correctamente", type: CampusResponse })
   @ApiResponse({ status: 400, description: "Problemas al intentar obtener una sede para eliminarla" })
   @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
-  async remove(@Param('id') id: number): Promise<ApiTransactionResponse<ICampus | string>> {
+  async remove(
+    @Param('id') id: number,
+    @MyGetUserDecorator() user: IUser
+  ): Promise<ApiTransactionResponse<ICampus | string>> {
 
-    return this.campusService.remove(id);
+    return this.campusService.remove(id, user);
 
   }
 
@@ -109,7 +112,7 @@ export class CampusController {
   @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async findPersonsByCampus(
     @Param('id') id: number,
-    @Body() pageOptionsDto: PageOptionsDto
+    @Body() pageOptionsDto: PageOptionsDto,
   ): Promise<PageDto<IPerson> | Object> {
 
     return this.campusService.findPersonsByCampus(id, pageOptionsDto);

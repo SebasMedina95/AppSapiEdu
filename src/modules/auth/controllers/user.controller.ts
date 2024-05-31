@@ -24,6 +24,7 @@ import { IEditUserWithUploadAvatarFile, IResponseTransactionBasic, IUser } from 
 import { ApiTransactionResponse } from 'src/utils/ApiResponse';
 import { FilesService } from 'src/helpers/files/files.service';
 import { Auth } from '../decorators/auth-protected.decorator';
+import { MyGetUserDecorator } from '../decorators/get-user.decorator';
 
 import { UserResponse, UserSimpleResponse } from '../doc/ResponseUser';
 import { PageUserDto } from '../doc/PageUserDto';
@@ -43,10 +44,11 @@ export class UserController {
   @ApiResponse({ status: 400, description: "Problemas con los campos que se están enviando" })
   @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async create(
-    @Body() createUserDto: CreateUserDto
+    @Body() createUserDto: CreateUserDto,
+    @MyGetUserDecorator() user: IUser
   ): Promise<ApiTransactionResponse<IResponseTransactionBasic | string>> {
 
-    return this.userService.create(createUserDto);
+    return this.userService.create(createUserDto, user);
 
   }
 
@@ -96,7 +98,8 @@ export class UserController {
     )
     file: Express.Multer.File,
     @Param('id') id: number, 
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserDto,
+    @MyGetUserDecorator() userLog: IUser
   ) {
 
     let url_cloudinary: string = "";
@@ -136,7 +139,7 @@ export class UserController {
           avatar: url_cloudinary
         }
 
-        this.userService.update(objReg);
+        this.userService.update(objReg, userLog);
 
       })
 
@@ -151,7 +154,7 @@ export class UserController {
         avatar: user.avatar
       }
 
-      const updateUser = await this.userService.update(objReg);
+      const updateUser = await this.userService.update(objReg, userLog);
       return updateUser;
 
     }

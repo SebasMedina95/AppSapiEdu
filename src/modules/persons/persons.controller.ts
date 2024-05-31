@@ -94,10 +94,11 @@ export class PersonsController {
   @ApiResponse({ status: 400, description: "Problemas al intentar obtener una persona para eliminarla" })
   @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async remove(
-    @Param('id') id: number
+    @Param('id') id: number,
+    @MyGetUserDecorator() user: IUser
   ): Promise<ApiTransactionResponse<IPerson | string>> {
 
-    return this.personsService.remove(id);
+    return this.personsService.remove(id, user);
 
   }
 }

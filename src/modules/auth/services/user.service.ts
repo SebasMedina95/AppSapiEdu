@@ -38,8 +38,12 @@ export class UserService {
 
   ){}
 
-  async create(createUserDto: CreateUserDto): Promise<ApiTransactionResponse<IResponseTransactionBasic | string>> {
+  async create(
+    createUserDto: CreateUserDto,
+    user: IUser
+  ): Promise<ApiTransactionResponse<IResponseTransactionBasic | string>> {
     
+    const personUser: IPerson = user.person as IPerson;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -64,9 +68,9 @@ export class UserService {
       const resUser = this.userRepository.create({ 
         user: createUserDto.user,
         password: bcrypt.hashSync( createUserDto.password, 10 ),
-        createDocumentUserAt: "123456789",
+        createDocumentUserAt: personUser.document,
         createDateAt: new Date(),
-        updateDocumentUserAt: "123456789",
+        updateDocumentUserAt: personUser.document,
         updateDateAt: new Date(),
         person: createUserDto.person
       });
@@ -148,6 +152,7 @@ export class UserService {
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<IUser>> {
 
     const queryBuilder = this.userRepository.createQueryBuilder("user");
+    queryBuilder.where("user.status = true")
 
     //* ************************* *//
     //* Apliquemos las relaciones *//
@@ -168,7 +173,7 @@ export class UserService {
     if( pageOptionsDto.search ){
 
       queryBuilder
-        .where("LOWER(person.document) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+        .andWhere("LOWER(person.document) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
         .orWhere("LOWER(person.names) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
         .orWhere("LOWER(person.lastNames) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
         .orWhere("LOWER(person.address) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
@@ -184,7 +189,6 @@ export class UserService {
     const entities = responseQueryBuilder.entities;
 
     queryBuilder
-      .where("user.status = true")
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
       .orderBy("user.id", pageOptionsDto.order);
@@ -258,11 +262,15 @@ export class UserService {
 
   }
 
-  async update(data: IEditUserWithUploadAvatarFile): Promise<ApiTransactionResponse<IUser | string>> {
+  async update(
+    data: IEditUserWithUploadAvatarFile, 
+    user: IUser
+  ): Promise<ApiTransactionResponse<IUser | string>> {
 
     try {
 
       //Encontremos primero el usuario por el ID
+      const personUser: IPerson = user.person as IPerson;
       const getUser: ApiTransactionResponse<string | IUser> = await this.findOne(Number(data.id));
 
       if( getUser.data == null )
@@ -273,7 +281,7 @@ export class UserService {
         user: data.user,
         password: bcrypt.hashSync( data.password, 10 ),
         avatar: data.avatar,
-        updateDocumentUserAt: "123456789",
+        updateDocumentUserAt: personUser.document,
         updateDateAt: new Date(),
       })
 
