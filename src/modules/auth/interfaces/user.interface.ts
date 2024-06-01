@@ -45,3 +45,9 @@ export interface IUserAuthenticated {
     user: IUser;
     token: string;
 }
+
+export interface IUserDecodeToken {
+    idUser: string,
+    iat: number,
+    exp: number
+}
