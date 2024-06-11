@@ -63,7 +63,7 @@ export class ManagementCentersController {
   @Auth('MANAGEMENT_CENTERS')
   @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id del Centro Gestor a obtener' })
   @ApiResponse({ status: 200, description: "Centro Gestor obtenido correctamente", type: ManagementCenterResponse })
-  @ApiResponse({ status: 400, description: "Problemas al intentar obtener una sede" })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener un centro gestor" })
   @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async findOne(
     @Param('id') id: number
@@ -77,7 +77,7 @@ export class ManagementCentersController {
   @Auth('MANAGEMENT_CENTERS')
   @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id del Centro Gestor a actualizar' })
   @ApiResponse({ status: 200, description: "Centro Gestor actualizado correctamente", type: ManagementCenterResponse })
-  @ApiResponse({ status: 400, description: "Problemas al intentar obtener una sede para actualizarla" })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener un centro gestor para actualizarla" })
   @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   update(
     @Param('id') id: number, 
@@ -91,9 +91,9 @@ export class ManagementCentersController {
 
   @Delete('/remove-logic/:id')
   @Auth('MANAGEMENT_CENTERS')
-  @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id de la sede a eliminar' })
-  @ApiResponse({ status: 200, description: "Campus eliminado lógicamente correctamente", type: ManagementCenterResponse })
-  @ApiResponse({ status: 400, description: "Problemas al intentar obtener una sede para eliminarla" })
+  @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id del centro de gestor a eliminar' })
+  @ApiResponse({ status: 200, description: "Centro Gestor eliminado lógicamente correctamente", type: ManagementCenterResponse })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener una centro gestor para eliminarla" })
   @ApiResponse({ status: 403, description: "No autorizado por vencimiento de Token" })
   async remove(
     @Param('id') id: number,

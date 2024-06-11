@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { PosPreOrigin } from "src/modules/pos-pre-origin/entities/pos-pre-origin.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
     name: "CEG_CENTROS_GESTORES"
@@ -111,5 +112,8 @@ export class ManagementCenter {
         comment: 'Fecha actualización'
     })
     updateDateAt?: Date;
+
+    @OneToMany( () => PosPreOrigin, (posPreOrigin) => posPreOrigin.managementCenter)
+    public posPresOrigins?: PosPreOrigin[];
 
 }
