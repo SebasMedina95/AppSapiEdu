@@ -122,7 +122,55 @@ export class PosPreOriginService {
 
   async findOne(id: number): Promise<ApiTransactionResponse<IPosPreOrigen | string>> {
 
-    throw new Error("Metodo no implementado");
+    try {
+      
+      const queryBuilder = this.posPreOriginRepository.createQueryBuilder("posPreOrig");
+
+      //* ************************* *//
+      //* Apliquemos las relaciones *//
+      //* ************************* *//
+      queryBuilder.leftJoinAndSelect("posPreOrig.managementCenter", "managementCenter");
+
+      queryBuilder.select([
+        "posPreOrig",
+        "managementCenter"
+      ]);
+
+      queryBuilder.where("posPreOrig.id = :paramId" , { paramId : id });
+      queryBuilder.getOne();
+
+      const { entities } = await queryBuilder.getRawAndEntities();
+      const result: IPosPreOrigen[] = entities as  IPosPreOrigen[];
+
+      if( result.length === 0 ){
+
+        return new ApiTransactionResponse(
+          null,
+          EResponseCodes.INFO,
+          "Posición Presupuestal de Origen no encontrada con el ID."
+        );
+
+      }else{
+
+        return new ApiTransactionResponse(
+          result[0],
+          EResponseCodes.OK,
+          "Posición Presupuestal de Origen obtenida correctamente."
+        );
+
+      }
+
+    } catch (error) {
+      
+      const fail: string = await this.errorsSQL.handleDbExceptions(error);
+
+      return new ApiTransactionResponse(
+        fail,
+        EResponseCodes.FAIL,
+        "Ocurrió un error al intentar encontrar a la Posición Presupuestal de Origen por ID."
+      );
+
+    }
 
   }
 
@@ -132,7 +180,49 @@ export class PosPreOriginService {
     user: IUser
   ): Promise<ApiTransactionResponse<IPosPreOrigen | string>> {
 
-    throw new Error("Metodo no implementado");
+    try {
+
+      const personUser: IPerson = user.person as IPerson;
+      const getPosPreSapi = await this.findOne(id);
+      
+      if( getPosPreSapi.data == null || !getPosPreSapi.data ){
+
+        return new ApiTransactionResponse(
+          null,
+          EResponseCodes.INFO,
+          "Posición Presupuestal de Origen no encontrada con el ID."
+        );
+
+      }
+
+      const updatePosPreSapi = await this.posPreOriginRepository.preload({
+        id,
+        updateDocumentUserAt: personUser.document,
+        updateDateAt: new Date(),
+        ...updatePosPreOriginDto
+      });
+
+      await this.posPreOriginRepository.save(updatePosPreSapi);
+
+      //TODO: Actualizar en el PosPreSapi (Pendiente cuando se cree el módulo)
+
+      return new ApiTransactionResponse(
+        updatePosPreSapi,
+        EResponseCodes.OK,
+        "Posición Presupuestal de Origen actualizado correctamente."
+      );
+      
+    } catch (error) {
+
+      const fail: string = await this.errorsSQL.handleDbExceptions(error);
+
+      return new ApiTransactionResponse(
+        fail,
+        EResponseCodes.FAIL,
+        "Ocurrió un error a intentar actualizar el Posición Presupuestal de Origen."
+      );
+      
+    }
 
   }
 
@@ -141,7 +231,49 @@ export class PosPreOriginService {
     user: IUser
   ): Promise<ApiTransactionResponse<IPosPreOrigen | string>> {
 
-    throw new Error("Metodo no implementado");
+    try {
+
+      const personUser: IPerson = user.person as IPerson;
+      const getPosPreSapi = await this.findOne(id);
+      
+      if( getPosPreSapi.data == null || !getPosPreSapi.data ){
+
+        return new ApiTransactionResponse(
+          null,
+          EResponseCodes.INFO,
+          "Posición Presupuestal de Origen no encontrada con el ID."
+        );
+
+      }
+
+      const updateManagementCenter = await this.posPreOriginRepository.preload({
+        id,
+        status: false,
+        updateDocumentUserAt: personUser.document,
+        updateDateAt: new Date()
+      })
+
+      await this.posPreOriginRepository.save(updateManagementCenter);
+
+      //TODO: Actualizar en el PosPreSapi (Pendiente cuando se cree el módulo)
+
+      return new ApiTransactionResponse(
+        updateManagementCenter,
+        EResponseCodes.OK,
+        "Posición Presupuestal de Origen eliminada correctamente."
+      );
+      
+    } catch (error) {
+
+      const fail: string = await this.errorsSQL.handleDbExceptions(error);
+
+      return new ApiTransactionResponse(
+        fail,
+        EResponseCodes.FAIL,
+        "Ocurrió un error a intentar eliminar lógicamente la Posición Presupuestal de Origen."
+      );
+      
+    }
 
   }
 }
