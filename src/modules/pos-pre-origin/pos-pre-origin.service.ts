@@ -6,6 +6,7 @@ import { CreatePosPreOriginDto } from './dto/create-pos-pre-origin.dto';
 import { UpdatePosPreOriginDto } from './dto/update-pos-pre-origin.dto';
 import { PageOptionsDto } from '../../helpers/paginations/dto/page-options.dto';
 import { PageDto } from '../../helpers/paginations/dto/page.dto';
+import { PageMetaDto } from '../../helpers/paginations/dto/page-meta.dto';
 
 import { IUser } from '../auth/interfaces/user.interface';
 import { IPosPreOrigen } from './interfaces/posiciones-presupuestales.interfaces';
@@ -78,7 +79,44 @@ export class PosPreOriginService {
     pageOptionsDto: PageOptionsDto
   ): Promise<PageDto<IPosPreOrigen> | Object> {
 
-    throw new Error("Metodo no implementado");
+    const queryBuilder = this.posPreOriginRepository.createQueryBuilder("posPreOrig");
+      queryBuilder.where("posPreOrig.status = true");
+
+      //* ************************* *//
+      //* Apliquemos las relaciones *//
+      //* ************************* *//
+      queryBuilder.leftJoinAndSelect("posPreOrig.managementCenter", "managementCenter");
+
+      queryBuilder.select([
+        "posPreOrig",
+        "managementCenter"
+      ]);
+
+      if( pageOptionsDto.search ){
+
+        queryBuilder
+          .andWhere("LOWER(posPreOrig.numberName) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(CAST(posPreOrig.exercise AS TEXT)) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(posPreOrig.denomination) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(posPreOrig.description) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(posPreOrig.createDocumentUserAt) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(posPreOrig.updateDocumentUserAt) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(managementCenter.name) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+          .orWhere("LOWER(managementCenter.description) LIKE :param", { param: '%' + pageOptionsDto.search + '%' })
+
+      }
+
+      queryBuilder
+        .skip(pageOptionsDto.skip)
+        .take(pageOptionsDto.take)
+        .orderBy("posPreOrig.id", pageOptionsDto.order);
+
+      const itemCount = await queryBuilder.getCount();
+      const { entities } = await queryBuilder.getRawAndEntities();
+      const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+      return new PageDto(entities, pageMetaDto);
+    
 
   }
 

@@ -51,7 +51,7 @@ async function bootstrap() {
 
   await app.listen( process.env.PORT );
   logger.log(`La APP está corriendo en puerto ${process.env.PORT}`);
-  logger.log(`La Documentación de laAPP está en ${process.env.WEB_SERVICE_DOCUMENTATION}`);
+  logger.log(`La Documentación de la APP está en ${process.env.WEB_SERVICE_DOCUMENTATION}`);
 
 }
 bootstrap();
