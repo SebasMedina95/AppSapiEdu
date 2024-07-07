@@ -3,7 +3,7 @@ import { Column,
          Entity,
          OneToMany,
          PrimaryGeneratedColumn } from "typeorm";
-import { Person } from "src/modules/persons/entities/person.entity";
+import { Person } from "../../../modules/persons/entities/person.entity";
 
 
 @Entity({

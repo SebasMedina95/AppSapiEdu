@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column,
+         Entity,
+         PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
     name: "ECO_ENTIDADES_CONTROL"

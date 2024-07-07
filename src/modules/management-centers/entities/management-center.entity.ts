@@ -1,6 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { PosPreOrigin } from "src/modules/pos-pre-origin/entities/pos-pre-origin.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column,
+         Entity,
+         OneToMany,
+         PrimaryGeneratedColumn } from "typeorm";
+import { PosPreOrigin } from "../../../modules/pos-pre-origin/entities/pos-pre-origin.entity";
 
 @Entity({
     name: "CEG_CENTROS_GESTORES"

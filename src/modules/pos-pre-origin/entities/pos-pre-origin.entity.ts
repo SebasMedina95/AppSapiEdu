@@ -1,6 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ManagementCenter } from "src/modules/management-centers/entities/management-center.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column,
+         Entity,
+         JoinColumn,
+         ManyToOne,
+         OneToMany,
+         PrimaryGeneratedColumn } from "typeorm";
+import { ManagementCenter } from "../../../modules/management-centers/entities/management-center.entity";
+import { PosPreSapi } from "../../../modules/pos-pre-sapi/entities/pos-pre-sapi.entity";
 
 @Entity({
     name: "PPR_POSICIONES_PRESUPUESTARIAS_ORIGEN"
@@ -154,5 +160,8 @@ export class PosPreOrigin {
     @ManyToOne(() => ManagementCenter, (managementCenter) => managementCenter.posPresOrigins, { eager: true })
     @JoinColumn({ name: 'FK_CENTRO_GESTOR' })
     managementCenter?: ManagementCenter | number;
+
+    @OneToMany( () => PosPreSapi, (posPreSapi) => posPreSapi.posPreOrigin)
+    public posPresOrigins?: PosPreSapi[];
 
 }

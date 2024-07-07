@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -10,7 +11,6 @@ import {
 } from 'typeorm';
 import { Person } from '../../persons/entities/person.entity';
 import { PermitAssignment } from './permit-assignment.entity';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({
   name: 'USU_USUARIO',

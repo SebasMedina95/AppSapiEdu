@@ -90,3 +90,7 @@ En este apartado, se explicará a generalidad cual es el propósito de la aplica
   El módulo de proyectos determina dos grandes grupos de trabajo, los proyectos de inversión y los proyectos de funcionamiento, para la generación de las diferentes rutas de presupuesto de control, es clave determinar cual es el proyecto que engloba los recursos, por ejemplo, por medio de un proyecto de inversión registramos los recursos iniciales o bien los recursos con los que se contará en determinada ruta presupuestal, mientras que los proyectos de funcionamiento contendrán la distribución de estos recursos en diferentes rutas presupuestales (se menciona diferentes porque podríamos tener diferentes proyectos y diferentes rutas como tal desglozando el recurso dado por un proyecto de inversión).
 
 
+## Pendientes ##
+REVISAR TODA LA GESTIÓN DE LOS POS PRE DE ORIGEN PARA CONTINUAR CON LOS POS PRE SAPI 
+EMEPEZAR TAMBIÉN A REVISAR COMO SERÍA LA FUNCIONALIDAD DE CARGA MASIVA DE POSICIONES PRESUPUESTALES
+TANTO DE ORIGEN COMO DE DESTINO USANDO UN ARCHIVO DE EXCEL (Como se iso en I4)
