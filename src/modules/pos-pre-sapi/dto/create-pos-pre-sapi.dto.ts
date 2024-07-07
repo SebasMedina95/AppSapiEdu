@@ -9,16 +9,17 @@ import { PosPreOrigin } from "../../../modules/pos-pre-origin/entities/pos-pre-o
 
 export class CreatePosPreSapiDto {
 
-    @ApiProperty({
-        example: "911000000290",
-        description: "Número de posición presupuestal Sapi",
-        uniqueItems: true,
-    })
-    @IsString({ message: "El número de la Posición Presupuestal Sapi debe ser un String válido" })
-    @MinLength(12, { message: "El número de la Posición Presupuestal Sapi debe tener al menos 12 caracteres" })
-    @MaxLength(30, { message: "El número de la Posición Presupuestal Sapi no puede exceder los 30 caracteres" })
-    @IsNotEmpty({ message: "El número de la Posición Presupuestal Sapi es requerido" })
-    numberName: string;
+    //? Esto lo vamos a calcular gracias al PosPreOrig y el Consecutivo
+    // @ApiProperty({
+    //     example: "911000000290",
+    //     description: "Número de posición presupuestal Sapi",
+    //     uniqueItems: true,
+    // })
+    // @IsString({ message: "El número de la Posición Presupuestal Sapi debe ser un String válido" })
+    // @MinLength(12, { message: "El número de la Posición Presupuestal Sapi debe tener al menos 12 caracteres" })
+    // @MaxLength(30, { message: "El número de la Posición Presupuestal Sapi no puede exceder los 30 caracteres" })
+    // @IsNotEmpty({ message: "El número de la Posición Presupuestal Sapi es requerido" })
+    // numberName: string;
 
     @ApiProperty({
         example: "2024",

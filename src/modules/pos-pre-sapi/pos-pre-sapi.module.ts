@@ -6,6 +6,7 @@ import { PosPreSapiService } from './pos-pre-sapi.service';
 import { PosPreSapiController } from './pos-pre-sapi.controller';
 
 import { Person } from '../persons/entities/person.entity';
+import { PosPreOrigin } from '../pos-pre-origin/entities/pos-pre-origin.entity';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
@@ -14,6 +15,7 @@ import { AuthModule } from '../auth/auth.module';
   imports: [
     TypeOrmModule.forFeature([ 
       PosPreSapi,
+      PosPreOrigin,
       Person
     ]),
     AuthModule
