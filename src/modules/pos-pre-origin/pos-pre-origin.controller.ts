@@ -73,9 +73,9 @@ export class PosPreOriginController {
 
   @Patch('/update/:id')
   @Auth('POS_PRE_ORIGIN')
-  @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id del Centro Gestor a actualizar' })
-  @ApiResponse({ status: 200, description: "Centro Gestor actualizado correctamente", type: PosPreOrigResponse })
-  @ApiResponse({ status: 400, description: "Problemas al intentar obtener un centro gestor para actualizarla" })
+  @ApiQuery({ name: 'id', required: true, type: Number, description: 'Id de la Posición Presupuestal de Origen a actualizar' })
+  @ApiResponse({ status: 200, description: "Posición Presupuestal de Origen actualizado correctamente", type: PosPreOrigResponse })
+  @ApiResponse({ status: 400, description: "Problemas al intentar obtener un Posición Presupuestal de Origen para actualizarla" })
   async update(
     @Param('id') id: number, 
     @Body() updatePosPreOriginDto: UpdatePosPreOriginDto,
