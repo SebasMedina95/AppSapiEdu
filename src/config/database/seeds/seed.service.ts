@@ -1,17 +1,19 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { InjectConnection, InjectRepository } from "@nestjs/typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 
-import { EResponseCodes } from "src/constants/ResponseCodesEnum";
-import { MySqlErrorsExceptions } from "src/helpers/exceptions-sql";
-import { ApiTransactionResponse } from "src/utils/ApiResponse";
+import { EResponseCodes } from "../../../constants/ResponseCodesEnum";
+import { MySqlErrorsExceptions } from "../../../helpers/exceptions-sql";
+import { ApiTransactionResponse } from "../../../utils/ApiResponse";
 
-import { PermitAssignment } from "src/modules/auth/entities/permit-assignment.entity";
-import { Role } from "src/modules/auth/entities/role.entity";
-import { User } from "src/modules/auth/entities/user.entity";
-import { Campus } from "src/modules/campus/entities/campus.entity";
-import { Person } from "src/modules/persons/entities/person.entity";
-import { ControlEntity } from "src/modules/control-entities/entities/control-entity.entity";
+import { PermitAssignment } from "../../../modules/auth/entities/permit-assignment.entity";
+import { Role } from "../../../modules/auth/entities/role.entity";
+import { User } from "../../../modules/auth/entities/user.entity";
+import { Campus } from "../../../modules/campus/entities/campus.entity";
+import { Person } from "../../../modules/persons/entities/person.entity";
+import { ControlEntity } from "../../../modules/control-entities/entities/control-entity.entity";
+import { PosPreOrigin } from "../../../modules/pos-pre-origin/entities/pos-pre-origin.entity";
+import { PosPreSapi } from "../../../modules/pos-pre-sapi/entities/pos-pre-sapi.entity";
 
 import { initialDataRoles } from "../core/roles.seed";
 import { initialDataCampus } from "../core/campus.seed";
@@ -19,6 +21,8 @@ import { initialDataPersons } from "../core/persons.seed";
 import { initialDataUsers } from "../core/users.seed";
 import { initialDataPermits } from "../core/permits.seed";
 import { initialDataControlEntities } from "../core/control-entities.seed";
+import { initialDataPorPreOrg } from "../core/PosPreOrig.seed";
+import { initialDataPorPreSapi } from "../core/PosPreSapi.seed";
 
 @Injectable()
 export class SeedService {
@@ -35,6 +39,8 @@ export class SeedService {
         @InjectRepository( PermitAssignment ) private readonly permitRepository: Repository<PermitAssignment>,
         @InjectRepository( Campus ) private readonly campusRepository: Repository<Campus>,
         @InjectRepository( ControlEntity ) private readonly controlEntityRepository: Repository<ControlEntity>,
+        @InjectRepository( PosPreOrigin ) private readonly posPreOrigRepository: Repository<PosPreOrigin>,
+        @InjectRepository( PosPreSapi ) private readonly posPreSapiRepository: Repository<PosPreSapi>,
     ){}
 
     async executeSeedForDb(): Promise<ApiTransactionResponse<string | null>> {
@@ -68,7 +74,7 @@ export class SeedService {
             //? *******************************
 
             //* ------------------------
-            //* 2.1 Registrar roles
+            //* 3.1 Registrar roles
             //* ------------------------
             const resultRoles = await this.registerRoles();
             if( !resultRoles || resultRoles == null ){
@@ -78,7 +84,7 @@ export class SeedService {
             }
 
             //* ------------------------
-            //* 2.2 Registrar sedes
+            //* 3.2 Registrar sedes
             //* ------------------------
             const resultCampus = await this.registerCampus();
             if( !resultCampus || resultCampus == null ){
@@ -88,7 +94,7 @@ export class SeedService {
             }
 
             //* ------------------------
-            //* 2.3 Registrar personas
+            //* 3.3 Registrar personas
             //* ------------------------
             const resultPersons = await this.registerPersons();
             if( !resultPersons || resultPersons == null ){
@@ -98,7 +104,7 @@ export class SeedService {
             }
 
             //* ------------------------
-            //* 2.4 Registrar usuarios
+            //* 3.4 Registrar usuarios
             //* ------------------------
             const resultUsers = await this.registerUsers();
             if( !resultUsers || resultUsers == null ){
@@ -108,7 +114,7 @@ export class SeedService {
             }
 
             //* --------------------------------------------
-            //* 2.5 Registrar los permisos de los usuarios
+            //* 3.5 Registrar los permisos de los usuarios
             //* --------------------------------------------
             const resultPermitsUsers = await this.registerPermitUsers();
             if( !resultPermitsUsers || resultPermitsUsers == null ){
@@ -118,13 +124,33 @@ export class SeedService {
             }
 
             //* --------------------------------------------
-            //* 2.6 Registrar entidades de control
+            //* 3.6 Registrar entidades de control
             //* --------------------------------------------
             const resultEntityControl = await this.registerEntityControls();
             if( !resultEntityControl || resultEntityControl == null ){
                 this.logger.error(`${resultEntityControl}, realizando Rollback`);
                 await queryRunner.rollbackTransaction();
                 return new ApiTransactionResponse(null, EResponseCodes.FAIL, "La transacción del seed fallo en el registro de entidades de control.");
+            }
+
+            //* --------------------------------------------
+            //* 3.7 Registrar posiciones presupuestales de origen
+            //* --------------------------------------------
+            const resultPosPreOrig = await this.registerPosPreOrig();
+            if( !resultPosPreOrig || resultPosPreOrig == null ){
+                this.logger.error(`${resultPosPreOrig}, realizando Rollback`);
+                await queryRunner.rollbackTransaction();
+                return new ApiTransactionResponse(null, EResponseCodes.FAIL, "La transacción del seed fallo en el registro de posiciones presupuestales de origen.");
+            }
+
+            //* --------------------------------------------
+            //* 3.8 Registrar posiciones presupuestales de sapi
+            //* --------------------------------------------
+            const resultPosPreSapi = await this.registerPosPreSapi();
+            if( !resultPosPreSapi || resultPosPreSapi == null ){
+                this.logger.error(`${resultPosPreSapi}, realizando Rollback`);
+                await queryRunner.rollbackTransaction();
+                return new ApiTransactionResponse(null, EResponseCodes.FAIL, "La transacción del seed fallo en el registro de posiciones presupuestales de sapi.");
             }
 
             //Genero la transacción completa
@@ -179,6 +205,14 @@ export class SeedService {
         //* 6. Eliminamos entidades de control
         const queryBuilderControlEntities = this.controlEntityRepository.createQueryBuilder();
         await queryBuilderControlEntities.delete().where({}).execute();
+
+        //* 7. Eliminamos las posiciones presupuestales sapi
+        const queryBuilderPosPreSapi = this.posPreSapiRepository.createQueryBuilder();
+        await queryBuilderPosPreSapi.delete().where({}).execute();
+
+        //* 8. Eliminamos las posiciones presupuestales origen
+        const queryBuilderPosPreOrig = this.posPreOrigRepository.createQueryBuilder();
+        await queryBuilderPosPreOrig.delete().where({}).execute();
 
         return "OK"
 
@@ -304,6 +338,42 @@ export class SeedService {
 
             const controlEntities = initialDataControlEntities.controlEntity;
             await this.controlEntityRepository.save(controlEntities);
+
+            return "OK"
+
+        } catch (error) {
+
+            this.logger.warn(error);
+            return null;
+
+        }
+
+    }
+
+    private async registerPosPreOrig(): Promise<string | null> {
+
+        try {
+
+            const posPreOrig = initialDataPorPreOrg.posPreOrig;
+            await this.posPreOrigRepository.save(posPreOrig);
+
+            return "OK"
+
+        } catch (error) {
+
+            this.logger.warn(error);
+            return null;
+
+        }
+
+    }
+
+    private async registerPosPreSapi(): Promise<string | null> {
+
+        try {
+
+            const posPreSapi = initialDataPorPreSapi.posPreSapi;
+            await this.posPreSapiRepository.save(posPreSapi);
 
             return "OK"
 
